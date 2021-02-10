@@ -10,5 +10,5 @@ The purpose of this project is to learn how compiler works and to get better at 
 
 1. Write lexer that takes code and returns list of lexemes (tokens)
 2. Define Abstract syntax tree (AST)
-3. Write parser that takes tokens and returns AST
+3. Write parser that takes tokens and returns AST (and also throws compile errors)
 4. Generate code for given AST in assembly (x86_64)
