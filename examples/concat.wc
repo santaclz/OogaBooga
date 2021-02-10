@@ -2,3 +2,5 @@ int a = 3;
 int b=2;
 char c(int a=3){a+a};
 v = a+b+c/t*c^2%3|6&7;
+bool h=false;
+bool z = true;
