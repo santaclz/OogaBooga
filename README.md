@@ -15,6 +15,8 @@ The purpose of this project is to learn how compiler works and to get better at 
 
 # Current progress
 
+Currently the program is able to recognize tokens from supplied file and separate which of them are part of a function body.
+
 Inside examples/simple_exp.wc
 
 ```
