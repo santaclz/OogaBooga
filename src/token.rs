@@ -1,21 +1,8 @@
-#[derive(Debug)]
-pub enum Token {
-    ID,
-    Type,
-    Value,
-    Assign,
-    Operator,
-    Lb,
-    Rb,
-    Lcb,
-    Rcb,
-    Ret,
-    Semicolon,
-}
+pub use crate::ast::{Token, TokenType};
 
 // Break string into tokens
-pub fn tokenizer(raw_code: &str) -> Vec<(Token, &str)> {
-    let mut tokens: Vec<(Token, &str)> = Vec::new();
+pub fn tokenizer(raw_code: &str) -> Vec<Token> {
+    let mut tokens: Vec<Token> = Vec::new();
     
     // Transfrom words into tokens
     for word in raw_code.split_whitespace() {
@@ -27,41 +14,54 @@ pub fn tokenizer(raw_code: &str) -> Vec<(Token, &str)> {
 }
 
 
-fn word_to_token(words: Vec<&str>) -> Vec<(Token, &str)> {
+fn word_to_token(words: Vec<&str>) -> Vec<Token> {
     // DEBUG
     //println!("{:?}", words);
 
-    let mut tokens_vec: Vec<(Token, &str)> = Vec::new();
+    let mut tokens_vec: Vec<Token> = Vec::new();
 
+    // Match struct token and put it into vector
     for word in words {
-        match word {
-            "int"|"char"|"string"|"bool" => tokens_vec.push((Token::Type, word)),
-            "(" => tokens_vec.push((Token::Lb, word)),
-            ")" => tokens_vec.push((Token::Rb, word)),
-            "{" => tokens_vec.push((Token::Lcb, word)),
-            "}" => tokens_vec.push((Token::Rcb, word)),
-            ";" => tokens_vec.push((Token::Semicolon, word)),
-            "=" => tokens_vec.push((Token::Assign, word)),
-            "+"|"-"|"/"|"*"|"%"|"^"|"|"|"&" => tokens_vec.push((Token::Operator, word)),
-            "return" => tokens_vec.push((Token::Ret, word)),
-            "" => (),
+        let tok: Option<Token> = match word {
+            "int"|"char"|"string"|"bool" => Some(Token { ttype: TokenType::Type, tvalue: word }),
+            "(" => Some(Token { ttype: TokenType::Lb, tvalue: word }),
+            ")" => Some(Token { ttype: TokenType::Rb, tvalue: word }),
+            "{" => Some(Token { ttype: TokenType::Lcb, tvalue: word }),
+            "}" => Some(Token { ttype: TokenType::Rcb, tvalue: word }),
+            ";" => Some(Token { ttype: TokenType::Semicolon, tvalue: word }),
+            "=" => Some(Token { ttype: TokenType::Equal, tvalue: word }),
+            "+" => Some(Token { ttype: TokenType::Plus, tvalue: word }),
+            "-" => Some(Token { ttype: TokenType::Minus, tvalue: word }),
+            "*" => Some(Token { ttype: TokenType::Mult, tvalue: word }),
+            "/" => Some(Token { ttype: TokenType::Div, tvalue: word }),
+            "%" => Some(Token { ttype: TokenType::Mod, tvalue: word }),
+            "return" => Some(Token { ttype: TokenType::Ret, tvalue: word }),
+            "" => None,
             _ => {
-                    // Check if number
-                    let num = word.parse::<f64>();
+                    // Check if signed int
+                    let num = word.parse::<i64>();
                     let is_num;
                     match num {
                         Ok(_ok) => is_num = true,
                         Err(_e) => is_num = false,
                     }
 
-                    // Check if string or char
-                    if is_num || word.contains('"') || word.contains("'") || word == "true" || word == "false" {
-                        tokens_vec.push((Token::Value, word));
-                    } else {
+                    // Check if int, str, char or bool
+                    if is_num                   { Some(Token { ttype: TokenType::Int, tvalue: word }) }
+                    else if word.contains('"')  { Some(Token { ttype: TokenType::Str, tvalue: word }) }
+                    else if word.contains("'")  { Some(Token { ttype: TokenType::Char, tvalue: word }) }
+                    else if word == "true" || word == "false" { Some(Token { ttype: TokenType::Bool, tvalue: word }) }
+                    else {
                         // If everything fails it's an ID
-                        tokens_vec.push((Token::ID, word));
+                        Some(Token { ttype: TokenType::ID, tvalue: word })
                     }
             }
+        };
+
+        // If token is empty do nothing
+        match tok {
+            Some(t) => tokens_vec.push(t),
+            None => (),
         }
     }
     tokens_vec
@@ -86,6 +86,8 @@ fn slice_syntax(word: &str) -> Vec<&str> {
     else if word.contains("%")  { separator = '%';  }
     else if word.contains("|")  { separator = '|';  }
     else if word.contains("&")  { separator = '&';  }
+    // Not a real token, just a separator
+    else if word.contains(",")  { separator = ',';  }
 
     if separator != '0' {
         // Slice word
@@ -97,7 +99,10 @@ fn slice_syntax(word: &str) -> Vec<&str> {
         let slice3 = &word[i+1..word.len()];
 
         let mut ret_vec: Vec<&str> = slice_syntax(slice1);
-        ret_vec.push(slice2);
+
+        // Ignore if separator is comma
+        if separator != ',' { ret_vec.push(slice2); }
+
         ret_vec.extend(slice_syntax(slice3));
         
         ret_vec

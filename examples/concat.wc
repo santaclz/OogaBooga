@@ -1,6 +1,6 @@
 int a = 3;
 int b=2;
 char c(int a=3){a+a};
-v = a+b+c/t*c^2%3|6&7;
+v = a+b+ c/4;
 bool h=false;
 bool z = true;

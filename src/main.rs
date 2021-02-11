@@ -1,3 +1,5 @@
+pub mod ast;
+mod parser;
 mod token;
 
 use std::env;
@@ -10,5 +12,8 @@ fn main() {
     let raw_code = fs::read_to_string(filename)
         .expect("Something went wrong reading the file");
 
-    println!("{:?}", token::tokenizer(&raw_code));
+    let ast = parser::parse_prog(token::tokenizer(&raw_code));
+
+    println!("\n\ntokenizer:\n\n{:?}", token::tokenizer(&raw_code));
+    println!("\n\nast:\n\n{:?}", ast);
 }

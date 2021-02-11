@@ -1,37 +1,40 @@
-enum Func {
-    Type,
-    Params,
-    Body,
-}
-
-enum Body {
-    Stat,
-    Cond,
-    Loop,
-}
-
-enum Stat {
-    Assign,
-    Return,
-}
-
-enum Assign {
+// Type of lexeme
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub enum TokenType {
     ID,
-    Exp,
-}
-
-enum Exp {
-    Val,
-    Operator,
-}
-
-enum Operator {
+    Type,
+    Char,
+    Str,
+    Int,
+    Bool,
+    Equal,
     Plus,
     Minus,
+    Mult,
+    Div,
+    Mod,
+    Lb,
+    Rb,
+    Lcb,
+    Rcb,
+    Ret,
+    Semicolon,
 }
 
-enum Value {
-    Number,
-    Str,
-    Char,
+// Lexeme with value
+#[derive(Debug, Copy, Clone)]
+pub struct Token<'a> {
+    pub ttype: TokenType,
+    pub tvalue: &'a str,
+}
+
+// Statement type
+#[derive(Debug)]
+pub enum StType {
+    Assign,
+    Print,
+    If,
+    While,
+    For,
+    Return,
 }
