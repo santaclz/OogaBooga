@@ -33,7 +33,7 @@ int main(int a, int b)
 
 Program output:
 
-```bash
+```
 $ cargo run examples/simple_exp.wc
 func_body:
 
