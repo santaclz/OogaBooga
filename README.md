@@ -17,7 +17,7 @@ The purpose of this project is to learn how compiler works and to get better at 
 
 Inside examples/simple_exp.wc
 
-`
+```
 $ cat examples/simple_exp.wc      
 int main(int a, int b)
 {
@@ -27,11 +27,11 @@ int main(int a, int b)
 	
 	return 0;
 } this should get ignored
-`
+```
 
 Program output:
 
-`
+```
 $ cargo run examples/simple_exp.wc
 func_body:
 
@@ -46,4 +46,4 @@ tokenizer:
 ast:
 
 []
-`
+```
