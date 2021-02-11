@@ -19,7 +19,7 @@ Currently the program is able to recognize tokens from supplied file and separat
 
 Inside examples/simple_exp.wc
 
-```bash
+```
 $ cat examples/simple_exp.wc      
 int main(int a, int b)
 {
@@ -33,7 +33,7 @@ int main(int a, int b)
 
 Program output:
 
-```rust
+```bash
 $ cargo run examples/simple_exp.wc
 func_body:
 
