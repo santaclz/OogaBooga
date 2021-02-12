@@ -5,9 +5,34 @@ pub fn tokenizer(raw_code: &str) -> Vec<Token> {
     let mut tokens: Vec<Token> = Vec::new();
     
     // Transfrom words into tokens
-    for word in raw_code.split_whitespace() {
+
+    // Split all words unless they are enclosed in quotes
+    let mut raw_code_split: Vec<&str> = Vec::new();
+
+    for (i, mut w) in raw_code.split('"').enumerate() {
+
+        // All odd elements of splitted code are strings
+        if i % 2 == 0 {
+            // Push all elements to vec
+            for ww in w.split_whitespace() {
+                raw_code_split.push(ww);
+            }
+        } else {
+            // Otherwise push entire string onto vec
+            // Find string in raw_code and add quotes from start-1 to end+1
+            // This is needed because we are operating on references and quotes are needed for
+            // further string processing
+            let start_str = raw_code.find(w).unwrap();
+            w = &raw_code[start_str - 1 .. start_str + w.len() + 1];
+            raw_code_split.push(w);
+        }
+    }
+
+    for word in raw_code_split {
+        
         // Check if word contains brackets or operators and split
         tokens.extend(word_to_token(slice_syntax(word)));
+
     }
 
     tokens
@@ -16,7 +41,7 @@ pub fn tokenizer(raw_code: &str) -> Vec<Token> {
 
 fn word_to_token(words: Vec<&str>) -> Vec<Token> {
     // DEBUG
-    //println!("{:?}", words);
+    //println!("\n\nword_to_token:\n\n{:?}", words);
 
     let mut tokens_vec: Vec<Token> = Vec::new();
 
@@ -72,7 +97,10 @@ fn word_to_token(words: Vec<&str>) -> Vec<Token> {
 fn slice_syntax(word: &str) -> Vec<&str> {
     let mut separator: char = '0';
 
-    if word.contains("(")  { separator = '(';  }
+    // If the given input contains whitespace it's a string
+    if word.contains(" ")       { vec!(word); }
+
+    else if word.contains("(")       { separator = '(';  }
     else if word.contains(")")  { separator = ')';  }
     else if word.contains("{")  { separator = '{';  }
     else if word.contains("}")  { separator = '}';  }

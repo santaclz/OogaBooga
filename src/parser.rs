@@ -19,21 +19,21 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<StType> {
     // Beginning of program must be function type
     if tok.ttype != TokenType::Type {
         eprintln!("Error parsing type of function {}", tok.tvalue);
-        process::exit(1);
+        //process::exit(1);
     }
     tok = token_iter.next().unwrap();
     
     // Next must follow function name
     if tok.ttype != TokenType::ID {
         eprintln!("Invalid function name {}", tok.tvalue);
-        process::exit(1);
+        //process::exit(1);
     }
     tok = token_iter.next().unwrap();
 
     // Next must follow left bracket
     if tok.ttype != TokenType::Lb {
         eprintln!("Missing: ( \nFound instead: {}", tok.tvalue);
-        process::exit(1);
+        //process::exit(1);
     }
 
     // Skip until function starts
@@ -46,7 +46,7 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<StType> {
     // Check for start of func body
     if tok.ttype != TokenType::Lcb {
         eprintln!("Missing: {{ \nFound instead: {}", tok.tvalue);
-        process::exit(1);
+        //process::exit(1);
     }
     tok = token_iter.next().unwrap();
 
