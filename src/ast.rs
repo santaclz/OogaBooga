@@ -18,11 +18,15 @@ pub enum TokenType {
     Lcb,
     Rcb,
     Ret,
+    Print,
+    If,
+    While,
+    For,
     Semicolon,
 }
 
 // Lexeme with value
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Token<'a> {
     pub ttype: TokenType,
     pub tvalue: &'a str,
@@ -31,10 +35,12 @@ pub struct Token<'a> {
 // Statement type
 #[derive(Debug)]
 pub enum StType {
-    Assign,
-    Print,
-    If,
-    While,
-    For,
-    Return,
+    Declare,    // string s;
+    Init,       // int a = 3;
+    Assign,     // a = 3;
+    Print,      // print("hello");
+    If,         // if (true) { }
+    While,      // while (true) { }
+    For,        // for (int i = 0; i < n; i++) { }
+    Return,     // return 2;
 }

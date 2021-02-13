@@ -14,6 +14,5 @@ fn main() {
 
     let ast = parser::parse_prog(token::tokenizer(&raw_code));
 
-    println!("\n\ntokenizer:\n\n{:?}", token::tokenizer(&raw_code));
     println!("\n\nast:\n\n{:?}", ast);
 }

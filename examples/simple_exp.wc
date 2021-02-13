@@ -2,7 +2,9 @@ int main(int a, int b)
 {
 	print("Hello World! 2+2 is ");
 	int a = 2+2;
-	print(a);
+
+	int b;
+	b=4;
 	
 	return 0;
 } this should get ignored

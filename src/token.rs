@@ -61,6 +61,10 @@ fn word_to_token(words: Vec<&str>) -> Vec<Token> {
             "/" => Some(Token { ttype: TokenType::Div, tvalue: word }),
             "%" => Some(Token { ttype: TokenType::Mod, tvalue: word }),
             "return" => Some(Token { ttype: TokenType::Ret, tvalue: word }),
+            "print" => Some(Token { ttype: TokenType::Print, tvalue: word }),
+            "if" => Some(Token { ttype: TokenType::If, tvalue: word }),
+            "while" => Some(Token { ttype: TokenType::While, tvalue: word }),
+            "for" => Some(Token { ttype: TokenType::For, tvalue: word }),
             "" => None,
             _ => {
                     // Check if signed int
