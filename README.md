@@ -4,7 +4,7 @@ Compiler written in Rust for my version of C called WiredC.
 
 # Why?
 
-The purpose of this project is to learn how compiler works and to get better at understanding low level stuff.
+The purpose of this project is to learn how compiler works and to get better at understanding assembly code. Also, this is my first Rust program, I just jumped straight into making a compiler with it, so far it's a great learning experience.
 
 # Steps
 
@@ -19,34 +19,29 @@ The purpose of this project is to learn how compiler works and to get better at 
 # Current progress
 
 Currently the program is able to recognize tokens from supplied file and separate which of them are part of a function body.
-It then parses the function body and recognizes which type of statements are inside it. I'm currently working on step 3. and 4.
+It then parses the function body and recognizes which type of statements are inside it. I'm currently working on step 3 and 4.
 
-Inside examples/simple_exp.wc
+Inside examples/return_0.wc
 
 ```
-$ cat examples/simple_exp.wc      
-int main(int a, int b)
-{
-	print("Hello World! 2+2 is ");
-	int a = 2+2;
-
-	int b;
-	b=4;
-	
+$ cat examples/return_0.wc      
+int main() {
+	if (a == b); 
+	while (x != 3);
+	for a in abc;
+	print("string with 2+2 spaces ");
 	return 0;
-} this should get ignored
+}
 ```
 
 Program output:
 
 ```
-$ cargo run examples/simple_exp.wc
-func_body:
+$ cargo run examples/return_0.wc
 
-[Token { ttype: Print, tvalue: "print" }, Token { ttype: Lb, tvalue: "(" }, Token { ttype: Str, tvalue: "\"Hello World! 2+2 is \"" }, Token { ttype: Rb, tvalue: ")" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Type, tvalue: "int" }, Token { ttype: ID, tvalue: "a" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Int, tvalue: "2" }, Token { ttype: Plus, tvalue: "+" }, Token { ttype: Int, tvalue: "2" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Type, tvalue: "int" }, Token { ttype: ID, tvalue: "b" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: ID, tvalue: "b" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Int, tvalue: "4" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Ret, tvalue: "return" }, Token { ttype: Int, tvalue: "0" }, Token { ttype: Semicolon, tvalue: ";" }]
+Tokens:
+[Token { ttype: Type, tvalue: "int" }, Token { ttype: ID, tvalue: "main" }, Token { ttype: Lb, tvalue: "(" }, Token { ttype: Rb, tvalue: ")" }, Token { ttype: Lcb, tvalue: "{" }, Token { ttype: If, tvalue: "if" }, Token { ttype: Lb, tvalue: "(" }, Token { ttype: ID, tvalue: "a" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: ID, tvalue: "b" }, Token { ttype: Rb, tvalue: ")" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: While, tvalue: "while" }, Token { ttype: Lb, tvalue: "(" }, Token { ttype: ID, tvalue: "x" }, Token { ttype: ID, tvalue: "!" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Int, tvalue: "3" }, Token { ttype: Rb, tvalue: ")" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: For, tvalue: "for" }, Token { ttype: ID, tvalue: "a" }, Token { ttype: ID, tvalue: "in" }, Token { ttype: ID, tvalue: "abc" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Print, tvalue: "print" }, Token { ttype: Lb, tvalue: "(" }, Token { ttype: Str, tvalue: "\"string with 2+2 spaces \"" }, Token { ttype: Rb, tvalue: ")" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Ret, tvalue: "return" }, Token { ttype: Int, tvalue: "0" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Rcb, tvalue: "}" }]
 
-
-ast:
-
-[Print, Init, Declare, Assign, Return]
+AST:
+[If, While, For, Print, Return]
 ```

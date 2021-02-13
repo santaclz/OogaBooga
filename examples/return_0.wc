@@ -1,3 +1,7 @@
-int main(int argc, char argv) {
+int main() {
+	if (a == b); 
+	while (x != 3);
+	for a in abc;
+	print("string with 2+2 spaces ");
 	return 0;
 }

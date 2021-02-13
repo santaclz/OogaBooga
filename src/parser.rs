@@ -62,7 +62,8 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<StType> {
         tok = token_iter.next().unwrap();
     }
 
-    println!("\n\nfunc_body:\n\n{:?}", token_func_body);
+    // DEBUG
+    //println!("\n\nfunc_body:\n\n{:?}", token_func_body);
     let parsed_func_body: Vec<StType> = parse_func(token_func_body);
 
     // Dummy code to avoid errors TEMPORARY!
@@ -105,99 +106,109 @@ fn parse_stat(tokens: Vec<Token>) -> StType {
     let mut token_iter = tokens.iter();
 
     // tok will loop through all tokens
-    let mut tok: &Token = token_iter.next().unwrap();
+    //let mut tok: &Token = token_iter.next().unwrap();
 
-    if tok.ttype == TokenType::Type {
-        tok = token_iter.next().unwrap();
+    match token_iter.next().unwrap().ttype {
 
-        if tok.ttype == TokenType::ID {
+        // Statement starts with type
+        TokenType::Type => {
+            match token_iter.next().unwrap().ttype {
 
-            // If reached end it's a declare statement
-            match token_iter.next() {
+                // Next element is ID
+                TokenType::ID => {
+                    match token_iter.next() {
+                        Some(t) => {
 
-                Some(t) => { 
-                    tok = t;
-                    if tok.ttype == TokenType::Equal {
-                        tok = token_iter.next().unwrap();
+                            // ID followed by equal sign
+                            if t.ttype == TokenType::Equal {
 
-                        match tok.ttype {
-                            TokenType::Char => StType::Init,
-                            TokenType::Str => StType::Init,
-                            TokenType::Int => StType::Init,
-                            TokenType::Bool => StType::Init,
-                            _ => {
-                                eprintln!("Error parsing init statement {}", tok.tvalue);
+                                // Statement is Init unless type does not match
+                                match token_iter.next().unwrap().ttype {
+                                    TokenType::Char => StType::Init,
+                                    TokenType::Str => StType::Init,
+                                    TokenType::Int => StType::Init,
+                                    TokenType::Bool => StType::Init,
+                                    _ => {
+                                        eprintln!("Error parsing init statement {:?}", tokens);
+                                        process::exit(1);
+                                    }
+                                }
+                            } else {
+                                eprintln!("Expected: =\nIn: {:?}", tokens);
                                 process::exit(1);
-                            },
+                            }
                         }
-                    } else {
-                        eprintln!("Expected: =\nFound: {}", tok.tvalue);
-                        process::exit(1);
+
+                        // If next element is empty it's a declare statement
+                        None => { StType::Declare }
                     }
-                },
-                None => StType::Declare,
+                }
+
+                _ =>  {
+                    eprintln!("Error element ID not found!");
+                    process::exit(1);
+                }
             }
-        } else {
-            // Statement is not Init nor Declare, but first token is Type
-            eprintln!("Invalid statement");
-            process::exit(1);
         }
-    } else {
-        // Statement does not start with Type
-        // It starts with ID
-        if tok.ttype == TokenType::ID {
-            tok = token_iter.next().unwrap();
 
-            // Check if statement is Assign
-            if tok.ttype == TokenType::Equal {
-                tok = token_iter.next().unwrap();
-                
-                match tok.ttype {
-                            TokenType::Char => StType::Assign,
-                            TokenType::Str => StType::Assign,
-                            TokenType::Int => StType::Assign,
-                            TokenType::Bool => StType::Assign,
-                            _ => {
-                                eprintln!("Error parsing assign statement {}", tok.tvalue);
-                                process::exit(1);
-                            },
-                        }
-            } else {
-                // The statement starts with ID but is not Assign
-                eprintln!("Error invalid statement {}", tok.tvalue);
-                process::exit(1);
-            }
-        } else {
-            // Statement does not start with Type nor ID
-            // It starts with print
-            if tok.ttype == TokenType::Print {
-                tok = token_iter.next().unwrap();
-
-                if tok.ttype == TokenType::Lb {
-                    tok = token_iter.next().unwrap();
-
-                    if tok.ttype == TokenType::Str {
-                        tok = token_iter.next().unwrap();
-
-                        if tok.ttype == TokenType::Rb {
-                            StType::Print
-                        } else {
-                            eprintln!("Missing: )\nFound: {}", tok.tvalue);
+        // Assign statement
+        TokenType::ID => {
+            if token_iter.next().unwrap().ttype == TokenType::Equal {
+                    
+                    match token_iter.next().unwrap().ttype {
+                        TokenType::Char => StType::Assign,
+                        TokenType::Str => StType::Assign,
+                        TokenType::Int => StType::Assign,
+                        TokenType::Bool => StType::Assign,
+                        _ => {
+                            eprintln!("Error parsing assign statement {:?}", tokens);
                             process::exit(1);
-                        }
+                        },
+                    }
+                } else {
+                    // The statement starts with ID but is not Assign
+                    eprintln!("Error invalid statement {:?}", tokens);
+                    process::exit(1);
+                }
+        }
+
+        // Print statement
+        // Starts with print keyword followed by ( string )
+        TokenType::Print => {
+            if token_iter.next().unwrap().ttype == TokenType::Lb {
+                if token_iter.next().unwrap().ttype == TokenType::Str {
+                    if token_iter.next().unwrap().ttype == TokenType::Rb {
+                        StType::Print
                     } else {
-                        eprintln!("Missing string from print\nFound instead: {}", tok.tvalue);
+                        eprintln!("Missing: )\nFound: {:?}", tokens);
                         process::exit(1);
                     }
                 } else {
-                    eprintln!("Missing: (\nFound: {}", tok.tvalue);
+                    eprintln!("Missing string from print\nFound instead: {:?}", tokens);
                     process::exit(1);
                 }
             } else {
-                // Check for If, While, For, Return
-                // TODO:^
-                StType::Return
+                eprintln!("Missing: (\nFound: {:?}", tokens);
+                process::exit(1);
             }
         }
+
+        // If statement
+        TokenType::If => { StType::If }
+
+        // While loop
+        TokenType::While => { StType::While }
+
+        // For loop
+        TokenType::For => { StType::For }
+
+        // Return statement
+        TokenType::Ret => { StType::Return }
+
+        _ => {
+            eprintln!("Error invalid statement!\n{:?}", tokens);
+            process::exit(1);
+        }
+
     }
 }
