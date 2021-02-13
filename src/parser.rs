@@ -155,21 +155,21 @@ fn parse_stat(tokens: Vec<Token>) -> StType {
         TokenType::ID => {
             if token_iter.next().unwrap().ttype == TokenType::Equal {
                     
-                    match token_iter.next().unwrap().ttype {
-                        TokenType::Char => StType::Assign,
-                        TokenType::Str => StType::Assign,
-                        TokenType::Int => StType::Assign,
-                        TokenType::Bool => StType::Assign,
-                        _ => {
-                            eprintln!("Error parsing assign statement {:?}", tokens);
-                            process::exit(1);
-                        },
-                    }
-                } else {
-                    // The statement starts with ID but is not Assign
-                    eprintln!("Error invalid statement {:?}", tokens);
-                    process::exit(1);
+                match token_iter.next().unwrap().ttype {
+                    TokenType::Char => StType::Assign,
+                    TokenType::Str => StType::Assign,
+                    TokenType::Int => StType::Assign,
+                    TokenType::Bool => StType::Assign,
+                    _ => {
+                        eprintln!("Error parsing assign statement {:?}", tokens);
+                        process::exit(1);
+                    },
                 }
+            } else {
+                // The statement starts with ID but is not Assign
+                eprintln!("Error invalid statement {:?}", tokens);
+                process::exit(1);
+            }
         }
 
         // Print statement
