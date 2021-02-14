@@ -1,9 +1,0 @@
-int main()
-{
-	int a = 121;
-	int a2=333;
-	char b = 'B';
-	string c = "hello";
-
-	return 0;
-}

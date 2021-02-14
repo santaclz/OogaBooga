@@ -1,0 +1,6 @@
+numba a = 3;
+numba b=2;
+stone c<numba a=3>[a+a];
+v = a+b+ c/4;
+hungry h=no;
+hungry z = yes;

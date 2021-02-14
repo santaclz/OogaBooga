@@ -19,6 +19,7 @@ pub enum TokenType {
     Rcb,
     Ret,
     Print,
+    Input,
     If,
     While,
     For,
@@ -35,12 +36,13 @@ pub struct Token<'a> {
 // Statement type
 #[derive(Debug)]
 pub enum StType {
-    Declare,    // string s;
-    Init,       // int a = 3;
+    Declare,    // str s;
+    Init,       // num a = 3;
     Assign,     // a = 3;
-    Print,      // print("hello");
-    If,         // if (true) { }
-    While,      // while (true) { }
-    For,        // for (int i = 0; i < n; i++) { }
-    Return,     // return 2;
+    Print,      // out < "hello";
+    Input,      // in > a;
+    If,         // if true [ ]
+    While,      // while true [ ]
+    For,        // for c in s [ ]
+    Return,     // exit 2;
 }

@@ -33,7 +33,7 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<StType> {
 
     // Next must follow left bracket
     if tok.ttype != TokenType::Lb {
-        eprintln!("Missing: ( \nFound instead: {}", tok.tvalue);
+        eprintln!("Missing: < \nFound instead: {}", tok.tvalue);
         process::exit(1);
     }
 
@@ -46,7 +46,7 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<StType> {
 
     // Check for start of func body
     if tok.ttype != TokenType::Lcb {
-        eprintln!("Missing: {{ \nFound instead: {}", tok.tvalue);
+        eprintln!("Missing: [ \nFound instead: {}", tok.tvalue);
         process::exit(1);
     }
     tok = token_iter.next().unwrap();
@@ -56,18 +56,20 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<StType> {
     let mut token_func_body: Vec<Token> = Vec::new();
 
     // Loop until end of function
-    // TODO: implement ignore } sign if another { is opened
-    while tok.ttype != TokenType::Rcb {
+    // Ignore ] sign if another [ is opened
+    let mut br_count: u32 = 1;
+
+    while br_count != 0 {
         token_func_body.push(*tok);
         tok = token_iter.next().unwrap();
+
+        if tok.ttype == TokenType::Lcb { br_count += 1; }
+        else if tok.ttype == TokenType::Rcb { br_count -= 1; }
     }
 
     // DEBUG
     //println!("\n\nfunc_body:\n\n{:?}", token_func_body);
     let parsed_func_body: Vec<StType> = parse_func(token_func_body);
-
-    // Dummy code to avoid errors TEMPORARY!
-    //branch.push(StType::Assign);
 
     branch.extend(parsed_func_body);
     
@@ -86,12 +88,30 @@ fn parse_func(tokens: Vec<Token>) -> Vec<StType> {
     // Tokens to pass to parse_stat function
     let mut stat_tokens: Vec<Token> = Vec::new();
 
+    // Separate tokens into statements
+    // Create variable inside_block that keeps track of depth of code blocks []
+    let mut inside_block: u32 = 0;
+
     for tok in tokens {
+        if tok.ttype == TokenType::Lcb {
+
+            inside_block += 1;
+                
+        } else if tok.ttype == TokenType::Rcb {
+
+            inside_block -= 1;
+
+        }
 
         // Gather all tokens until semicolon, then pass them to parse_stat
-        if tok.ttype != TokenType::Semicolon {
+        // Also make sure to include all code blocks as a single statement
+        if (tok.ttype != TokenType::Semicolon && tok.ttype != TokenType::Rcb)
+            || inside_block != 0 {
+
             stat_tokens.push(tok);
         } else {
+            // DEBUG
+            //println!("\n\nstat_tokens\n{:?}", stat_tokens);
             func_ast.push(parse_stat(stat_tokens.clone()));
             stat_tokens.clear();
         }
@@ -100,7 +120,6 @@ fn parse_func(tokens: Vec<Token>) -> Vec<StType> {
     func_ast
 }
 
-// Ugly function, bunch of nested if statements ewww
 fn parse_stat(tokens: Vec<Token>) -> StType {
 
     let mut token_iter = tokens.iter();
@@ -177,18 +196,30 @@ fn parse_stat(tokens: Vec<Token>) -> StType {
         TokenType::Print => {
             if token_iter.next().unwrap().ttype == TokenType::Lb {
                 if token_iter.next().unwrap().ttype == TokenType::Str {
-                    if token_iter.next().unwrap().ttype == TokenType::Rb {
-                        StType::Print
-                    } else {
-                        eprintln!("Missing: )\nFound: {:?}", tokens);
-                        process::exit(1);
-                    }
+
+                    StType::Print
+
                 } else {
                     eprintln!("Missing string from print\nFound instead: {:?}", tokens);
                     process::exit(1);
                 }
             } else {
-                eprintln!("Missing: (\nFound: {:?}", tokens);
+                eprintln!("Missing: <\nFound: {:?}", tokens);
+                process::exit(1);
+            }
+        }
+
+        // Input statement
+        TokenType::Input => {
+            if token_iter.next().unwrap().ttype == TokenType::Rb {
+                if token_iter.next().unwrap().ttype == TokenType::ID {
+                    StType::Input
+                } else {
+                    eprintln!("Missing variable from input at: {:?}", tokens);
+                    process::exit(1);
+                }
+            } else {
+                eprintln!("Missing > from input at: {:?}", tokens);
                 process::exit(1);
             }
         }

@@ -48,11 +48,11 @@ fn word_to_token(words: Vec<&str>) -> Vec<Token> {
     // Match struct token and put it into vector
     for word in words {
         let tok: Option<Token> = match word {
-            "int"|"char"|"string"|"bool" => Some(Token { ttype: TokenType::Type, tvalue: word }),
-            "(" => Some(Token { ttype: TokenType::Lb, tvalue: word }),
-            ")" => Some(Token { ttype: TokenType::Rb, tvalue: word }),
-            "{" => Some(Token { ttype: TokenType::Lcb, tvalue: word }),
-            "}" => Some(Token { ttype: TokenType::Rcb, tvalue: word }),
+            "numba"|"stone"|"rock"|"hungry" => Some(Token { ttype: TokenType::Type, tvalue: word }),
+            "<" => Some(Token { ttype: TokenType::Lb, tvalue: word }),
+            ">" => Some(Token { ttype: TokenType::Rb, tvalue: word }),
+            "[" => Some(Token { ttype: TokenType::Lcb, tvalue: word }),
+            "]" => Some(Token { ttype: TokenType::Rcb, tvalue: word }),
             ";" => Some(Token { ttype: TokenType::Semicolon, tvalue: word }),
             "=" => Some(Token { ttype: TokenType::Equal, tvalue: word }),
             "+" => Some(Token { ttype: TokenType::Plus, tvalue: word }),
@@ -60,11 +60,12 @@ fn word_to_token(words: Vec<&str>) -> Vec<Token> {
             "*" => Some(Token { ttype: TokenType::Mult, tvalue: word }),
             "/" => Some(Token { ttype: TokenType::Div, tvalue: word }),
             "%" => Some(Token { ttype: TokenType::Mod, tvalue: word }),
-            "return" => Some(Token { ttype: TokenType::Ret, tvalue: word }),
-            "print" => Some(Token { ttype: TokenType::Print, tvalue: word }),
+            "death" => Some(Token { ttype: TokenType::Ret, tvalue: word }),
+            "shout" => Some(Token { ttype: TokenType::Print, tvalue: word }),
+            "eat" => Some(Token { ttype: TokenType::Input, tvalue: word }),
             "if" => Some(Token { ttype: TokenType::If, tvalue: word }),
-            "while" => Some(Token { ttype: TokenType::While, tvalue: word }),
-            "for" => Some(Token { ttype: TokenType::For, tvalue: word }),
+            "spin" => Some(Token { ttype: TokenType::While, tvalue: word }),
+            "roll" => Some(Token { ttype: TokenType::For, tvalue: word }),
             "" => None,
             _ => {
                     // Check if signed int
@@ -79,7 +80,7 @@ fn word_to_token(words: Vec<&str>) -> Vec<Token> {
                     if is_num                   { Some(Token { ttype: TokenType::Int, tvalue: word }) }
                     else if word.contains('"')  { Some(Token { ttype: TokenType::Str, tvalue: word }) }
                     else if word.contains("'")  { Some(Token { ttype: TokenType::Char, tvalue: word }) }
-                    else if word == "true" || word == "false" { Some(Token { ttype: TokenType::Bool, tvalue: word }) }
+                    else if word == "yes" || word == "no" { Some(Token { ttype: TokenType::Bool, tvalue: word }) }
                     else {
                         // If everything fails it's an ID
                         Some(Token { ttype: TokenType::ID, tvalue: word })
@@ -104,10 +105,10 @@ fn slice_syntax(word: &str) -> Vec<&str> {
     // If the given input contains whitespace it's a string
     if word.contains(" ")       { vec!(word); }
 
-    else if word.contains("(")       { separator = '(';  }
-    else if word.contains(")")  { separator = ')';  }
-    else if word.contains("{")  { separator = '{';  }
-    else if word.contains("}")  { separator = '}';  }
+    else if word.contains("<")       { separator = '<';  }
+    else if word.contains(">")  { separator = '>';  }
+    else if word.contains("[")  { separator = '[';  }
+    else if word.contains("]")  { separator = ']';  }
     else if word.contains(";")  { separator = ';';  }
     else if word.contains("=")  { separator = '=';  }
     else if word.contains("+")  { separator = '+';  }

@@ -1,0 +1,8 @@
+numba main<> [
+	if a == b; 
+	spin x != 3;
+	roll a in abc;
+	shout<"rock with 2+2 spaces ";
+	hungry h = no;
+	death 0;
+]

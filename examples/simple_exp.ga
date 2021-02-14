@@ -1,0 +1,27 @@
+numba main <numba env1, numba env2> 
+[
+	shout < "Ooga Booga! 2+2 is ";
+	numba a;
+	eat > a;
+
+	numba b;
+	b=4;
+
+	rock r = "banana";
+	stone s = 'b';
+	hungry food = yes;
+	
+	roll c in r finger i [
+		shout < i;
+	]
+
+	spin b == 0 [
+		death 1;
+	]
+
+	if food [
+		shout < "4";
+	]
+	
+	death 0;
+]
