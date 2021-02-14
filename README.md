@@ -6,7 +6,7 @@ Compiler written in Rust for my programming language called OogaBooga.
 
 The purpose of this project is to learn how compiler works and to get better at understanding assembly code. Also, this is my first Rust program, I just jumped straight into making a compiler with it, so far it's a great learning experience.
 
-# About language
+# About OogaBooga
 
 OogaBooga syntax is very similar to C.
 
