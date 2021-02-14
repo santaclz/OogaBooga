@@ -10,26 +10,26 @@ The purpose of this project is to learn how compiler works and to get better at 
 
 OogaBooga syntax is very similar to C.
 
-Data types
+### Data types
 ```
 numba 	= signed int
 hungry 	= boolean
 rock 	= string
 stone 	= char
 ```
-IO commands
+### I/O commands
 ```
 shout	= prints to screen
 eat	= takes input and saves it to a variable
 ```
-Statements
+### Statements
 ```
 if			= if
-roll c in r finger i	= for c in r (with i as index) -> loops through word similar to python
+roll c in r finger i	= for c in r (with i as index) -> loops through string similar to python
 spin			= while loop
 death			= return
 ```
-Brackets
+### Brackets
 ```
 Square brackets [] are used instead of braces {}
 and greater than and less than signs <> instead of parentheses ().
