@@ -1,6 +1,6 @@
 # About
 
-Compiler written in Rust for my own programming language called OogaBooga.
+Compiler written in Rust for my programming language called OogaBooga.
 
 # Why?
 
