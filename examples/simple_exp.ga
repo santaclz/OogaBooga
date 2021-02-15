@@ -16,12 +16,12 @@ numba main <numba env1, numba env2>
 	]
 
 	spin b == 0 [
-		death 1;
+		begone 1;
 	]
 
 	if food [
 		shout < "4";
 	]
 	
-	death 0;
+	begone 0;
 ]

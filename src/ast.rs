@@ -36,13 +36,21 @@ pub struct Token<'a> {
 // Statement type
 #[derive(Debug)]
 pub enum StType {
-    Declare,    // str s;
-    Init,       // num a = 3;
+    Declare,    // rock s;
+    Init,       // numba a = 3;
     Assign,     // a = 3;
-    Print,      // out < "hello";
-    Input,      // in > a;
+    Print,      // shout < "hello";
+    Input,      // eat > a;
     If,         // if true [ ]
-    While,      // while true [ ]
-    For,        // for c in s [ ]
-    Return,     // exit 2;
+    While,      // spin true [ ]
+    For,        // roll c in s finger i [ ]
+    Return,     // begone 2;
+}
+
+// Statement with its type and vector of Tokens
+// Loops contain vector of Nodes
+#[derive(Debug)]
+pub struct Node<'a> {
+    pub stype: StType,
+    pub svalue: Vec<Token<'a>>,
 }

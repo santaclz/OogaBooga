@@ -1,11 +1,11 @@
-pub use crate::ast::{Token, TokenType, StType};
+pub use crate::ast::{Token, TokenType, StType, Node};
 use std::process;
 
 // Parse function returns AST view of the program
 // TODO: make nice verbose errors!
-pub fn parse_prog(tokens: Vec<Token>) -> Vec<StType> {
+pub fn parse_prog(tokens: Vec<Token>) -> Vec<Node> {
 
-    let mut branch: Vec<StType> = Vec::new();
+    let mut branch: Vec<Node> = Vec::new();
 
     // Parse tokens outside functions and pass others to parse_func
     // TODO: ^
@@ -69,21 +69,22 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<StType> {
 
     // DEBUG
     //println!("\n\nfunc_body:\n\n{:?}", token_func_body);
-    let parsed_func_body: Vec<StType> = parse_func(token_func_body);
+    let parsed_func_body: Vec<Node> = parse_func(token_func_body);
 
     branch.extend(parsed_func_body);
     
     branch
 }
 
+// Parse func parameters
 fn parse_func_params(tokens: Vec<Token>) {
-    // Parse func parameters
 
 }
 
-fn parse_func(tokens: Vec<Token>) -> Vec<StType> {
-    // Parse func body
-    let mut func_ast: Vec<StType> = Vec::new();
+// Parse func body
+fn parse_func(tokens: Vec<Token>) -> Vec<Node> {
+
+    let mut func_ast: Vec<Node> = Vec::new();
 
     // Tokens to pass to parse_stat function
     let mut stat_tokens: Vec<Token> = Vec::new();
@@ -120,7 +121,9 @@ fn parse_func(tokens: Vec<Token>) -> Vec<StType> {
     func_ast
 }
 
-fn parse_stat(tokens: Vec<Token>) -> StType {
+// Parse single statement
+// For parsing loops, parse_stat will call itself recursively
+fn parse_stat(tokens: Vec<Token>) -> Node {
 
     let mut token_iter = tokens.iter();
 
@@ -143,10 +146,10 @@ fn parse_stat(tokens: Vec<Token>) -> StType {
 
                                 // Statement is Init unless type does not match
                                 match token_iter.next().unwrap().ttype {
-                                    TokenType::Char => StType::Init,
-                                    TokenType::Str => StType::Init,
-                                    TokenType::Int => StType::Init,
-                                    TokenType::Bool => StType::Init,
+                                    TokenType::Char => Node { stype: StType::Init, svalue: tokens },
+                                    TokenType::Str => Node { stype: StType::Init, svalue: tokens },
+                                    TokenType::Int => Node { stype: StType::Init, svalue: tokens },
+                                    TokenType::Bool => Node { stype: StType::Init, svalue: tokens },
                                     _ => {
                                         eprintln!("Error parsing init statement {:?}", tokens);
                                         process::exit(1);
@@ -159,7 +162,7 @@ fn parse_stat(tokens: Vec<Token>) -> StType {
                         }
 
                         // If next element is empty it's a declare statement
-                        None => { StType::Declare }
+                        None => Node { stype: StType::Declare, svalue: tokens }
                     }
                 }
 
@@ -175,10 +178,10 @@ fn parse_stat(tokens: Vec<Token>) -> StType {
             if token_iter.next().unwrap().ttype == TokenType::Equal {
                     
                 match token_iter.next().unwrap().ttype {
-                    TokenType::Char => StType::Assign,
-                    TokenType::Str => StType::Assign,
-                    TokenType::Int => StType::Assign,
-                    TokenType::Bool => StType::Assign,
+                    TokenType::Char => Node { stype: StType::Assign, svalue: tokens },
+                    TokenType::Str => Node { stype: StType::Assign, svalue: tokens },
+                    TokenType::Int => Node { stype: StType::Assign, svalue: tokens },
+                    TokenType::Bool => Node { stype: StType::Assign, svalue: tokens },
                     _ => {
                         eprintln!("Error parsing assign statement {:?}", tokens);
                         process::exit(1);
@@ -197,7 +200,7 @@ fn parse_stat(tokens: Vec<Token>) -> StType {
             if token_iter.next().unwrap().ttype == TokenType::Lb {
                 if token_iter.next().unwrap().ttype == TokenType::Str {
 
-                    StType::Print
+                    Node { stype: StType::Print, svalue: tokens }
 
                 } else {
                     eprintln!("Missing string from print\nFound instead: {:?}", tokens);
@@ -213,7 +216,7 @@ fn parse_stat(tokens: Vec<Token>) -> StType {
         TokenType::Input => {
             if token_iter.next().unwrap().ttype == TokenType::Rb {
                 if token_iter.next().unwrap().ttype == TokenType::ID {
-                    StType::Input
+                    Node { stype: StType::Input, svalue: tokens }
                 } else {
                     eprintln!("Missing variable from input at: {:?}", tokens);
                     process::exit(1);
@@ -225,16 +228,30 @@ fn parse_stat(tokens: Vec<Token>) -> StType {
         }
 
         // If statement
-        TokenType::If => { StType::If }
+        TokenType::If => { 
+            // TODO parse if statements with other types of cond
+            // Now it works only if next token is ID 
+            if token_iter.next().unwrap().ttype == TokenType::ID {
+                if token_iter.next().unwrap().ttype == TokenType::Lcb {
+                    Node { stype: StType::If, svalue: tokens }
+                } else {
+                    eprintln!("Missing [ on if statement in: {:?}", tokens);
+                    process::exit(1);
+                }
+            } else {
+                eprintln!("Missing bool expression on if statement in: {:?}", tokens);
+                process::exit(1);
+            }
+        }
 
         // While loop
-        TokenType::While => { StType::While }
+        TokenType::While => Node { stype: StType::While, svalue: tokens },
 
         // For loop
-        TokenType::For => { StType::For }
+        TokenType::For => Node { stype: StType::For, svalue: tokens },
 
         // Return statement
-        TokenType::Ret => { StType::Return }
+        TokenType::Ret => Node { stype: StType::Return, svalue: tokens },
 
         _ => {
             eprintln!("Error invalid statement!\n{:?}", tokens);

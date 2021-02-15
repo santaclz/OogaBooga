@@ -60,7 +60,7 @@ fn word_to_token(words: Vec<&str>) -> Vec<Token> {
             "*" => Some(Token { ttype: TokenType::Mult, tvalue: word }),
             "/" => Some(Token { ttype: TokenType::Div, tvalue: word }),
             "%" => Some(Token { ttype: TokenType::Mod, tvalue: word }),
-            "death" => Some(Token { ttype: TokenType::Ret, tvalue: word }),
+            "begone" => Some(Token { ttype: TokenType::Ret, tvalue: word }),
             "shout" => Some(Token { ttype: TokenType::Print, tvalue: word }),
             "eat" => Some(Token { ttype: TokenType::Input, tvalue: word }),
             "if" => Some(Token { ttype: TokenType::If, tvalue: word }),

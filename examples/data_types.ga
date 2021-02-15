@@ -5,5 +5,5 @@ numba main<>
 	stone b = 'B';
 	rock c = "hello";
 
-	death 0;
+	begone 0;
 ]
