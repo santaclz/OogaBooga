@@ -48,7 +48,7 @@ and greater than and less than signs <> instead of parentheses ().
 # Current progress
 
 Currently the program is able to recognize tokens from supplied file and separate which of them are part of a function body.
-It then parses the function body and recognizes which type of statements are inside it. I'm currently working on step 3 and 4.
+It then parses the function body and recognizes which type of statements are inside it. I'm currently working on step 4.
 
 Inside examples/simple_exp.ga
 
