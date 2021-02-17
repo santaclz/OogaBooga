@@ -53,4 +53,25 @@ pub enum StType {
 pub struct Node<'a> {
     pub stype: StType,
     pub svalue: Vec<Token<'a>>,
+    pub sbody: Option<Vec<Node<'a>>>,
+}
+
+impl<'a> Node<'a> {
+    // Create new note without body
+    pub fn new(typ: StType, val: Vec<Token<'a>>) -> Self {
+        Node {
+            stype: typ,
+            svalue: val,
+            sbody: None,
+        }
+    }
+
+    // Create new node with body
+    pub fn new_block(typ: StType, val: Vec<Token<'a>>, body: Option<Vec<Node<'a>>>) -> Self {
+        Node {
+            stype: typ,
+            svalue: val,
+            sbody: body,
+        }
+    }
 }

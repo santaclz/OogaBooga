@@ -7,7 +7,7 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<Node> {
 
     let mut branch: Vec<Node> = Vec::new();
 
-    // Parse tokens outside functions and pass others to parse_func
+    // Parse tokens outside functions and pass others to parse_block
     // TODO: ^
     
     let mut token_iter = tokens.iter();
@@ -51,7 +51,7 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<Node> {
     }
     tok = token_iter.next().unwrap();
 
-    // Create vector of Tokens and pass it to parse_func
+    // Create vector of Tokens and pass it to parse_block
     // for further processing of function body
     let mut token_func_body: Vec<Token> = Vec::new();
 
@@ -69,7 +69,7 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<Node> {
 
     // DEBUG
     //println!("\n\nfunc_body:\n\n{:?}", token_func_body);
-    let parsed_func_body: Vec<Node> = parse_func(token_func_body);
+    let parsed_func_body: Vec<Node> = parse_block(token_func_body);
 
     branch.extend(parsed_func_body);
     
@@ -81,8 +81,8 @@ fn parse_func_params(tokens: Vec<Token>) {
 
 }
 
-// Parse func body
-fn parse_func(tokens: Vec<Token>) -> Vec<Node> {
+// Parse func body : turn tokens into nodes
+fn parse_block(tokens: Vec<Token>) -> Vec<Node> {
 
     let mut func_ast: Vec<Node> = Vec::new();
 
@@ -111,6 +111,12 @@ fn parse_func(tokens: Vec<Token>) -> Vec<Node> {
 
             stat_tokens.push(tok);
         } else {
+
+            // Fix not including ] at the end
+            if tok.ttype == TokenType::Rcb {
+                stat_tokens.push(tok);
+            }
+            
             // DEBUG
             //println!("\n\nstat_tokens\n{:?}", stat_tokens);
             func_ast.push(parse_stat(stat_tokens.clone()));
@@ -146,10 +152,10 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
 
                                 // Statement is Init unless type does not match
                                 match token_iter.next().unwrap().ttype {
-                                    TokenType::Char => Node { stype: StType::Init, svalue: tokens },
-                                    TokenType::Str => Node { stype: StType::Init, svalue: tokens },
-                                    TokenType::Int => Node { stype: StType::Init, svalue: tokens },
-                                    TokenType::Bool => Node { stype: StType::Init, svalue: tokens },
+                                    TokenType::Char => Node::new(StType::Init, tokens),
+                                    TokenType::Str => Node::new(StType::Init, tokens),
+                                    TokenType::Int => Node::new(StType::Init, tokens),
+                                    TokenType::Bool => Node::new(StType::Init, tokens),
                                     _ => {
                                         eprintln!("Error parsing init statement {:?}", tokens);
                                         process::exit(1);
@@ -162,7 +168,7 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
                         }
 
                         // If next element is empty it's a declare statement
-                        None => Node { stype: StType::Declare, svalue: tokens }
+                        None => Node::new(StType::Declare, tokens)
                     }
                 }
 
@@ -178,10 +184,11 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
             if token_iter.next().unwrap().ttype == TokenType::Equal {
                     
                 match token_iter.next().unwrap().ttype {
-                    TokenType::Char => Node { stype: StType::Assign, svalue: tokens },
-                    TokenType::Str => Node { stype: StType::Assign, svalue: tokens },
-                    TokenType::Int => Node { stype: StType::Assign, svalue: tokens },
-                    TokenType::Bool => Node { stype: StType::Assign, svalue: tokens },
+                    TokenType::Char => Node::new(StType::Assign, tokens),
+                    TokenType::Str => Node::new(StType::Assign, tokens),
+                    TokenType::Int => Node::new(StType::Assign, tokens),
+                    TokenType::Bool => Node::new(StType::Assign, tokens),
+                    TokenType::ID => Node::new(StType::Assign, tokens),
                     _ => {
                         eprintln!("Error parsing assign statement {:?}", tokens);
                         process::exit(1);
@@ -198,9 +205,13 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
         // Starts with print keyword followed by ( string )
         TokenType::Print => {
             if token_iter.next().unwrap().ttype == TokenType::Lb {
-                if token_iter.next().unwrap().ttype == TokenType::Str {
 
-                    Node { stype: StType::Print, svalue: tokens }
+                // Create pointer for iter as same value needs to pass multiple checks
+                let mut tok: &Token = token_iter.next().unwrap();
+
+                if tok.ttype == TokenType::Str || tok.ttype == TokenType::ID {
+
+                    Node::new(StType::Print, tokens)
 
                 } else {
                     eprintln!("Missing string from print\nFound instead: {:?}", tokens);
@@ -216,7 +227,7 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
         TokenType::Input => {
             if token_iter.next().unwrap().ttype == TokenType::Rb {
                 if token_iter.next().unwrap().ttype == TokenType::ID {
-                    Node { stype: StType::Input, svalue: tokens }
+                    Node::new(StType::Input, tokens)
                 } else {
                     eprintln!("Missing variable from input at: {:?}", tokens);
                     process::exit(1);
@@ -229,29 +240,183 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
 
         // If statement
         TokenType::If => { 
-            // TODO parse if statements with other types of cond
-            // Now it works only if next token is ID 
-            if token_iter.next().unwrap().ttype == TokenType::ID {
-                if token_iter.next().unwrap().ttype == TokenType::Lcb {
-                    Node { stype: StType::If, svalue: tokens }
-                } else {
-                    eprintln!("Missing [ on if statement in: {:?}", tokens);
-                    process::exit(1);
+            // Slice tokens into cond and body
+            let mut scond: Vec<Token> = Vec::new();
+            let mut sbody: Vec<Token> = Vec::new();
+
+            // Put all cond tokens into scond
+            let mut tok: &Token = token_iter.next().unwrap();
+            let mut toko: Option<&Token> = Some(tok);
+
+            // Gather all tokens until start of code block
+            while tok.ttype != TokenType::Lcb {
+                
+                match toko {
+                    Some(t) => {
+                        scond.push(*t);
+                        toko = token_iter.next();
+
+                        match toko {
+                            Some(tt)    => { tok = tt; }
+                            None        => {
+                                // Error if opening bracket not found
+                                eprintln!("Error missing ] on:\n{:?}", tokens);
+                                process::exit(1);
+                            }
+                        }
+                    }
+                    
+                    None => { 
+                        // Missing condition from if
+                        eprintln!("Error missing condition on:\n{:?}", tokens);
+                        process::exit(1);
+                    }
                 }
-            } else {
-                eprintln!("Missing bool expression on if statement in: {:?}", tokens);
-                process::exit(1);
             }
+
+            // Skip open bracket
+            tok = token_iter.next().unwrap();
+
+            // Put all others into sbody
+            let mut br_count: u32 = 1;
+            
+            // If next element is closed bracket don't enter the while loop
+            if tok.ttype == TokenType::Rcb {
+                br_count = 0;
+            }
+
+            while br_count != 0 {
+                sbody.push(*tok);
+                tok = token_iter.next().unwrap();
+
+                if tok.ttype == TokenType::Lcb { br_count += 1; }
+                else if tok.ttype == TokenType::Rcb { br_count -= 1; }
+            }
+
+            // Parse sbody into Vec<Node>
+            Node::new_block(StType::If, scond, Some(parse_block(sbody)))
         }
 
         // While loop
-        TokenType::While => Node { stype: StType::While, svalue: tokens },
+        TokenType::While => { 
+            // Slice tokens into cond and body
+            let mut scond: Vec<Token> = Vec::new();
+            let mut sbody: Vec<Token> = Vec::new();
+
+            // Put all cond tokens into scond
+            let mut tok: &Token = token_iter.next().unwrap();
+            let mut toko: Option<&Token> = Some(tok);
+
+            // Gather all tokens until start of code block
+            while tok.ttype != TokenType::Lcb {
+                
+                match toko {
+                    Some(t) => {
+                        scond.push(*t);
+                        toko = token_iter.next();
+
+                        match toko {
+                            Some(tt)    => { tok = tt; }
+                            None        => {
+                                // Error if opening bracket not found
+                                eprintln!("Error missing ] on:\n{:?}", tokens);
+                                process::exit(1);
+                            }
+                        }
+                    }
+                    
+                    None => { 
+                        // Missing condition from if
+                        eprintln!("Error missing condition on:\n{:?}", tokens);
+                        process::exit(1);
+                    }
+                }
+            }
+
+            // Skip open bracket
+            tok = token_iter.next().unwrap();
+
+            // Put all others into sbody
+            let mut br_count: u32 = 1;
+            
+            // If next element is closed bracket don't enter the while loop
+            if tok.ttype == TokenType::Rcb {
+                br_count = 0;
+            }
+
+            while br_count != 0 {
+                sbody.push(*tok);
+                tok = token_iter.next().unwrap();
+
+                if tok.ttype == TokenType::Lcb { br_count += 1; }
+                else if tok.ttype == TokenType::Rcb { br_count -= 1; }
+            }
+
+            // Parse sbody into Vec<Node>
+            Node::new_block(StType::While, scond, Some(parse_block(sbody)))
+        }
 
         // For loop
-        TokenType::For => Node { stype: StType::For, svalue: tokens },
+        TokenType::For => { 
+            // Slice tokens into cond and body
+            let mut scond: Vec<Token> = Vec::new();
+            let mut sbody: Vec<Token> = Vec::new();
+
+            // Put all cond tokens into scond
+            let mut tok: &Token = token_iter.next().unwrap();
+            let mut toko: Option<&Token> = Some(tok);
+
+            // Gather all tokens until start of code block
+            while tok.ttype != TokenType::Lcb {
+                
+                match toko {
+                    Some(t) => {
+                        scond.push(*t);
+                        toko = token_iter.next();
+
+                        match toko {
+                            Some(tt)    => { tok = tt; }
+                            None        => {
+                                // Error if opening bracket not found
+                                eprintln!("Error missing ] on:\n{:?}", tokens);
+                                process::exit(1);
+                            }
+                        }
+                    }
+                    
+                    None => { 
+                        // Missing condition from if
+                        eprintln!("Error missing condition on:\n{:?}", tokens);
+                        process::exit(1);
+                    }
+                }
+            }
+
+            // Skip open bracket
+            tok = token_iter.next().unwrap();
+
+            // Put all others into sbody
+            let mut br_count: u32 = 1;
+            
+            // If next element is closed bracket don't enter the while loop
+            if tok.ttype == TokenType::Rcb {
+                br_count = 0;
+            }
+
+            while br_count != 0 {
+                sbody.push(*tok);
+                tok = token_iter.next().unwrap();
+
+                if tok.ttype == TokenType::Lcb { br_count += 1; }
+                else if tok.ttype == TokenType::Rcb { br_count -= 1; }
+            }
+
+            // Parse sbody into Vec<Node>
+            Node::new_block(StType::For, scond, Some(parse_block(sbody)))
+        }
 
         // Return statement
-        TokenType::Ret => Node { stype: StType::Return, svalue: tokens },
+        TokenType::Ret => Node::new(StType::Return, tokens),
 
         _ => {
             eprintln!("Error invalid statement!\n{:?}", tokens);

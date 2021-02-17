@@ -20,7 +20,9 @@ numba main <numba env1, numba env2>
 	]
 
 	if food [
-		shout < "4";
+		shout < "444";
+		a = b;
+		numba g = 565;
 	]
 	
 	begone 0;
