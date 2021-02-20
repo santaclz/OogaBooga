@@ -35,6 +35,7 @@ fn assign_asm(tokens: Vec<Token>) -> String {
     let val = tokens[2].tvalue;
 
     // Move value on stack
+    // TODO manage stack and calcuate offsets!
     asm_code = format!("\tmov dword [rbp-{}],{};\n", 0x8, val);
 
     asm_code

@@ -43,7 +43,7 @@ and greater than and less than signs <> instead of parentheses ().
 4. Write parser that takes tokens and returns AST (and also throws compile errors)
 5. Generate code for given AST in assembly (x86_64)
 6. Write assembly to file
-7. Use NASM to convert assembly to an executable
+7. Use NASM to convert assembly to an object file and `ld -m elf_x86_64` to executable
 
 # Current progress
 
