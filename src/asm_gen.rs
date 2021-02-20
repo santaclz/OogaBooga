@@ -1,17 +1,28 @@
 pub use crate::ast::{Token, TokenType, StType, Node};
 
 pub fn gen_asm(ast: Vec<Node>) -> String {
+
+    // Final code string
     let mut asm_code_str: String = String::new();
     
     // Start of file
-    asm_code_str += "global _main
+    asm_code_str += "global _start
 section .text
 
-_main:";
+_start:
+    call main;";
 
+    // Exit syscall
+    asm_code_str += "
+    mov rax, 60;
+    mov rdi, 0;
+    syscall;";
+
+    // main function
     // Prepeare stack for start of function
     asm_code_str += 
     "
+main:
     push rbp;
     mov rbp,rsp;\n";
 

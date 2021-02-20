@@ -51,7 +51,23 @@ Currently the program is able to recognize tokens from supplied file and separat
 Then it creates vector of structs Node (Step 4). Struct Node contains three fields: stype (statement type), svalue (tokens) and sbody (if statement has a block of code like if, for or while statement, then content of that code block is stored here). 
 The program then loops through that vector and generates assembly code (Step 5). I'm currently working on translating all OogaBooga statements into assembly code as well as implementing System V ABI calling convention.
 
-Program output:
+# Code generation
+
+Before generating assembly code we need to make sure that the program exits correctly. For that purpose I'm prepending this piece of code. 
+```
+global _start
+section .text
+
+_start:
+    call main;
+    mov rax, 60;
+    mov rdi, 0;
+    syscall;
+```
+First we define a global directive `_start` which is needed for linker (ld) to know where the program starts. Then we define start of section `.text` which is used to store code.
+Then in function `_start` we call main and once it finishes we make a syscall to exit the program (exit is called by placing 60 in rax register and exit status in rdi).
+
+# Program output
 
 ```
 $ cargo run examples/assembly/simple_assembly.ga
@@ -69,10 +85,15 @@ numba main<> [
 
 Assembly x86-64:
 
-global _main
+global _start
 section .text
 
-_main:
+_start:
+    call main;
+    mov rax, 60;
+    mov rdi, 0;
+    syscall;
+main:
     push rbp;
     mov rbp,rsp;
     mov dword [rbp-8],1;
