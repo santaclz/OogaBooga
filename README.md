@@ -69,15 +69,15 @@ numba main<> [
 
 Assembly x86-64:
 
-global _start
-    section .text
+global _main
+section .text
 
-    _start:
-        push rbp;
-        mov rbp,rsp;
-    	mov dword [rbp-8],1;
-	mov dword [rbp-4],2;
-	mov eax,0;
-        pop rbp;
-        ret;
+_main:
+    push rbp;
+    mov rbp,rsp;
+    mov dword [rbp-8],1;
+    mov dword [rbp-4],2;
+    mov eax,0;
+    pop rbp;
+    ret;
 ```
