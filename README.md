@@ -49,7 +49,7 @@ and greater than and less than signs <> instead of parentheses ().
 
 Currently the program is able to recognize tokens from supplied file and separate which of them are part of a function body (Step 2). It then parses the function body and recognizes which type of statements are inside it. 
 Then it creates vector of structs Node (Step 4). Struct Node contains three fields: stype (statement type), svalue (tokens) and sbody (if statement has a block of code like if, for or while statement, then content of that code block is stored here). 
-The program then loops through that vector and generates assembly code (Step 5). I'm currently working on translating all OogaBooga statements into assembly code as well as implementing System V ABI calling convention.
+The program then loops through that vector and generates assembly code (Step 5). I'm currently working on translating all OogaBooga statements into assembly code.
 
 # Code generation
 
