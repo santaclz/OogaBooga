@@ -43,62 +43,41 @@ and greater than and less than signs <> instead of parentheses ().
 4. Write parser that takes tokens and returns AST (and also throws compile errors)
 5. Generate code for given AST in assembly (x86_64)
 6. Write assembly to file
-7. Use GCC to convert assembly to an executable
+7. Use NASM to convert assembly to an executable
 
 # Current progress
 
-Currently the program is able to recognize tokens from supplied file and separate which of them are part of a function body. It then parses the function body and recognizes which type of statements are inside it. 
-Then it creates vector of structs Node. Struct Node contains three fields: stype (statement type), svalue (tokens) and sbody (if statement has a block of code like if, for or while statement, then content of that code block is stored here). 
-Later the program will loop through that vector and generate code. (Step 5)
-
-Program output is not readable at this point, might create tool for pretty printing.
-
-
-Inside examples/simple_exp.ga
-
-```
-$ cat examples/simple_exp.ga 
-
-numba main <numba env1, numba env2> 
-[
-	shout < "Ooga Booga! 2+2 is ";
-	numba a;
-	eat > a;
-
-	numba b;
-	b=4;
-
-	rock r = "banana";
-	stone s = 'b';
-	hungry food = yes;
-	
-	roll c in r finger i [
-		shout < i;
-	]
-
-	spin b == 0 [
-		begone 1;
-	]
-
-	if food [
-		shout < "444";
-		a = b;
-		numba g = 565;
-	]
-	
-	begone 0;
-]
-
-```
+Currently the program is able to recognize tokens from supplied file and separate which of them are part of a function body (Step 2). It then parses the function body and recognizes which type of statements are inside it. 
+Then it creates vector of structs Node (Step 4). Struct Node contains three fields: stype (statement type), svalue (tokens) and sbody (if statement has a block of code like if, for or while statement, then content of that code block is stored here). 
+The program then loops through that vector and generates assembly code (Step 5). I'm currently working on translating all OogaBooga statements into assembly code. Then I will implement loops and functions.
 
 Program output:
 
 ```
-$ cargo run examples/simple_exp.ga
+$ cargo run examples/assembly/simple_assembly.ga
 
-Tokens:
-[Token { ttype: Type, tvalue: "numba" }, Token { ttype: ID, tvalue: "main" }, Token { ttype: Lb, tvalue: "<" }, Token { ttype: Type, tvalue: "numba" }, Token { ttype: ID, tvalue: "env1" }, Token { ttype: Type, tvalue: "numba" }, Token { ttype: ID, tvalue: "env2" }, Token { ttype: Rb, tvalue: ">" }, Token { ttype: Lcb, tvalue: "[" }, Token { ttype: Print, tvalue: "shout" }, Token { ttype: Lb, tvalue: "<" }, Token { ttype: Str, tvalue: "\"Ooga Booga! 2+2 is \"" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Type, tvalue: "numba" }, Token { ttype: ID, tvalue: "a" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Input, tvalue: "eat" }, Token { ttype: Rb, tvalue: ">" }, Token { ttype: ID, tvalue: "a" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Type, tvalue: "numba" }, Token { ttype: ID, tvalue: "b" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: ID, tvalue: "b" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Int, tvalue: "4" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Type, tvalue: "rock" }, Token { ttype: ID, tvalue: "r" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Str, tvalue: "\"banana\"" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Type, tvalue: "stone" }, Token { ttype: ID, tvalue: "s" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Char, tvalue: "\'b\'" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Type, tvalue: "hungry" }, Token { ttype: ID, tvalue: "food" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Bool, tvalue: "yes" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: For, tvalue: "roll" }, Token { ttype: ID, tvalue: "c" }, Token { ttype: ID, tvalue: "in" }, Token { ttype: ID, tvalue: "r" }, Token { ttype: ID, tvalue: "finger" }, Token { ttype: ID, tvalue: "i" }, Token { ttype: Lcb, tvalue: "[" }, Token { ttype: Print, tvalue: "shout" }, Token { ttype: Lb, tvalue: "<" }, Token { ttype: ID, tvalue: "i" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Rcb, tvalue: "]" }, Token { ttype: While, tvalue: "spin" }, Token { ttype: ID, tvalue: "b" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Int, tvalue: "0" }, Token { ttype: Lcb, tvalue: "[" }, Token { ttype: Ret, tvalue: "begone" }, Token { ttype: Int, tvalue: "1" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Rcb, tvalue: "]" }, Token { ttype: If, tvalue: "if" }, Token { ttype: ID, tvalue: "food" }, Token { ttype: Lcb, tvalue: "[" }, Token { ttype: Print, tvalue: "shout" }, Token { ttype: Lb, tvalue: "<" }, Token { ttype: Str, tvalue: "\"444\"" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: ID, tvalue: "a" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: ID, tvalue: "b" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Type, tvalue: "numba" }, Token { ttype: ID, tvalue: "g" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Int, tvalue: "565" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Rcb, tvalue: "]" }, Token { ttype: Ret, tvalue: "begone" }, Token { ttype: Int, tvalue: "0" }, Token { ttype: Semicolon, tvalue: ";" }, Token { ttype: Rcb, tvalue: "]" }]
+Raw code:
 
-AST:
-[Node { stype: Print, svalue: [Token { ttype: Print, tvalue: "shout" }, Token { ttype: Lb, tvalue: "<" }, Token { ttype: Str, tvalue: "\"Ooga Booga! 2+2 is \"" }], sbody: None }, Node { stype: Declare, svalue: [Token { ttype: Type, tvalue: "numba" }, Token { ttype: ID, tvalue: "a" }], sbody: None }, Node { stype: Input, svalue: [Token { ttype: Input, tvalue: "eat" }, Token { ttype: Rb, tvalue: ">" }, Token { ttype: ID, tvalue: "a" }], sbody: None }, Node { stype: Declare, svalue: [Token { ttype: Type, tvalue: "numba" }, Token { ttype: ID, tvalue: "b" }], sbody: None }, Node { stype: Assign, svalue: [Token { ttype: ID, tvalue: "b" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Int, tvalue: "4" }], sbody: None }, Node { stype: Init, svalue: [Token { ttype: Type, tvalue: "rock" }, Token { ttype: ID, tvalue: "r" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Str, tvalue: "\"banana\"" }], sbody: None }, Node { stype: Init, svalue: [Token { ttype: Type, tvalue: "stone" }, Token { ttype: ID, tvalue: "s" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Char, tvalue: "\'b\'" }], sbody: None }, Node { stype: Init, svalue: [Token { ttype: Type, tvalue: "hungry" }, Token { ttype: ID, tvalue: "food" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Bool, tvalue: "yes" }], sbody: None }, Node { stype: For, svalue: [Token { ttype: ID, tvalue: "c" }, Token { ttype: ID, tvalue: "in" }, Token { ttype: ID, tvalue: "r" }, Token { ttype: ID, tvalue: "finger" }, Token { ttype: ID, tvalue: "i" }], sbody: Some([Node { stype: Print, svalue: [Token { ttype: Print, tvalue: "shout" }, Token { ttype: Lb, tvalue: "<" }, Token { ttype: ID, tvalue: "i" }], sbody: None }]) }, Node { stype: While, svalue: [Token { ttype: ID, tvalue: "b" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Int, tvalue: "0" }], sbody: Some([Node { stype: Return, svalue: [Token { ttype: Ret, tvalue: "begone" }, Token { ttype: Int, tvalue: "1" }], sbody: None }]) }, Node { stype: If, svalue: [Token { ttype: ID, tvalue: "food" }], sbody: Some([Node { stype: Print, svalue: [Token { ttype: Print, tvalue: "shout" }, Token { ttype: Lb, tvalue: "<" }, Token { ttype: Str, tvalue: "\"444\"" }], sbody: None }, Node { stype: Assign, svalue: [Token { ttype: ID, tvalue: "a" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: ID, tvalue: "b" }], sbody: None }, Node { stype: Init, svalue: [Token { ttype: Type, tvalue: "numba" }, Token { ttype: ID, tvalue: "g" }, Token { ttype: Equal, tvalue: "=" }, Token { ttype: Int, tvalue: "565" }], sbody: None }]) }, Node { stype: Return, svalue: [Token { ttype: Ret, tvalue: "begone" }, Token { ttype: Int, tvalue: "0" }], sbody: None }]
+numba main<> [
+
+	numba a;
+	a = 1;
+	numba b = 2;
+
+	begone 0;
+]
+
+Assembly x86-64:
+
+global _start
+    section .text
+
+    _start:
+        push rbp;
+        mov rbp,rsp;
+    	mov dword [rbp-8],1;
+	mov dword [rbp-4],2;
+	mov eax,0;
+        pop rbp;
+        ret;
 ```
