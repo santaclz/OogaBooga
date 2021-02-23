@@ -47,7 +47,6 @@ and greater than and less than signs <> instead of parentheses ().
 
 # Lexer
 
-<<<<<<< HEAD
 Lexer recognizes tokens from supplied file and assigns them their type.
 Ex. `shout < "Ooga Booga";` is consisted from tokens: `Print`, `Lc`, `Str`, `Semicolon`.
 
@@ -59,12 +58,7 @@ Ex. `[Print, Lc, Str, Semicolon]` should be recognized as a print statement. Thi
 # Abstract Syntax Tree
 
 AST (for short) is a way of representing structure of source code written in programming language.
-To implement it I simply created struct `Node` which holds information about a single statement (its type, tokens, value). And then I created a vector of `Node`s which is my AST created from supplied source code.
-=======
-Currently the program is able to recognize tokens from supplied file and separate which of them are part of a function body (Step 2). It then parses the function body and recognizes which type of statements are inside it. 
-Then it creates vector of structs Node (Step 4). Struct Node contains three fields: stype (statement type), svalue (tokens) and sbody (if statement has a block of code like if, for or while statement, then content of that code block is stored here). 
-The program then loops through that vector and generates assembly code (Step 5). I'm currently working on translating all OogaBooga statements into assembly code.
->>>>>>> c1445c93d0db81d4be09c46352049cc03fc3f6df
+To implement it I simply created struct `Node` which holds information about a single statement (its type, tokens, value). Then I created a vector which holds all `Node`s which is my AST created from supplied source code.
 
 # Code generation
 
