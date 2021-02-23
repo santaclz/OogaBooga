@@ -101,7 +101,6 @@ main [
 Assembly x86-64:
 
 global _start
-extern printf
 
 section .text
 

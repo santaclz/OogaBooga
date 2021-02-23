@@ -7,7 +7,6 @@ pub fn gen_asm(ast: Vec<Node>) -> String {
     
     // Start of file
     asm_code_str += "global _start
-extern printf
 
 section .text
 
