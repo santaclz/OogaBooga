@@ -4,11 +4,11 @@ Compiler written in Rust for my programming language called OogaBooga.
 
 # Why?
 
-The purpose of this project is to learn how compiler works and to get better at understanding assembly code. Also, this is my first Rust program, I just jumped straight into making a compiler with it, so far it's a great learning experience.
+The purpose of this project is to learn how compiler works and to get better at understanding assembly code. Also, this is my first Rust program, I just jumped straight into making a compiler with it, so far it's a great learning experience. For the sake of learning I will not be using any dependencies which would aid me in parsing the source code (RegEx, other parsers...).
 
 # About OogaBooga
 
-OogaBooga syntax is very similar to C.
+OogaBooga syntax is similar to C. There is no function types only labels.
 
 ### Data types
 ```
@@ -45,13 +45,26 @@ and greater than and less than signs <> instead of parentheses ().
 6. Write assembly to file
 7. Use NASM to convert assembly to an object file and `ld -m elf_x86_64` to executable
 
-# Current progress
+# Lexer
 
-Currently the program is able to recognize tokens from supplied file and separate which of them are part of a function body (Step 2). It then parses the function body and recognizes which type of statements are inside it. 
-Then it creates vector of structs Node (Step 4). Struct Node contains three fields: stype (statement type), svalue (tokens) and sbody (if statement has a block of code like if, for or while statement, then content of that code block is stored here). 
-The program then loops through that vector and generates assembly code (Step 5). I'm currently working on translating all OogaBooga statements into assembly code as well as implementing System V ABI calling convention.
+Lexer recognizes tokens from supplied file and assigns them their type.
+Ex. `shout < "Ooga Booga";` is consisted from tokens: `Print`, `Lc`, `Str`, `Semicolon`.
+
+# Parser
+
+Parser separates the function body and recognizes which type of statements are inside it. Its goal is to group tokens from Lexer into statements.
+Ex. `[Print, Lc, Str, Semicolon]` should be recognized as a print statement. This is where I implemented checking for compile errors.
+
+# Abstract Syntax Tree
+
+AST (for short) is a way of representing structure of source code written in programming language.
+To implement it I simply created struct `Node` which holds information about a single statement (its type, tokens, value). And then I created a vector of `Node`s which is my AST created from supplied source code.
 
 # Code generation
+
+The program goes through AST (vector of `Node`s) and for each statement generates its equivalent assembly code.
+
+## Assembly
 
 Before generating assembly code we need to make sure that the program exits correctly. For that purpose I'm prepending this piece of code. 
 ```
@@ -70,15 +83,17 @@ Then in function `_start` we call main and once it finishes we make a syscall to
 # Program output
 
 ```
-$ cargo run examples/assembly/simple_assembly.ga
+$ cargo run examples/simple_assembly.ga
 
 Raw code:
 
-numba main<> [
+main [
 
 	numba a;
 	a = 1;
 	numba b = 2;
+	shout < "Ooga Booga!";
+	shout < "Hello World!";
 
 	begone 0;
 ]
@@ -86,6 +101,8 @@ numba main<> [
 Assembly x86-64:
 
 global _start
+extern printf
+
 section .text
 
 _start:
@@ -93,12 +110,44 @@ _start:
     mov rax, 60;
     mov rdi, 0;
     syscall;
+
 main:
     push rbp;
     mov rbp,rsp;
     mov dword [rbp-8],1;
     mov dword [rbp-4],2;
+    mov rax,1;
+    mov rdi,1;
+    mov rsi,msg0;
+    mov rdx, msg0len;
+    syscall;
+    mov rax,1;
+    mov rdi,1;
+    mov rsi,msg1;
+    mov rdx, msg1len;
+    syscall;
     mov eax,0;
     pop rbp;
     ret;
+
+section .rodata
+    msg0: db "Ooga Booga!",10
+    msg0len equ $-msg0
+    msg1: db "Hello World!",10
+    msg1len equ $-msg1
 ```
+
+# Executing the code
+
+To execute the program copy assembly code to a file and then run:
+```
+$ nasm -f elf64 -o test.o test.s
+$ ld -m elf_x86_64 -o test test.o
+$ ./test
+```
+For program in `examples/simple_assembly.ga` you should get output:
+```
+Ooga Booga!
+Hello World!
+```
+Will add generating executables later...

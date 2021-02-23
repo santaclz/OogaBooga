@@ -16,37 +16,16 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<Node> {
 
     // tok will loop through all tokens
     let mut tok: &Token = token_iter.next().unwrap();
-
-    // Beginning of program must be function type
-    if tok.ttype != TokenType::Type {
-        eprintln!("Error parsing type of function {}", tok.tvalue);
-        process::exit(1);
-    }
-    tok = token_iter.next().unwrap();
     
-    // Next must follow function name
+    // Start of program must be function name
     if tok.ttype != TokenType::ID {
         eprintln!("Invalid function name {}", tok.tvalue);
         process::exit(1);
     }
     tok = token_iter.next().unwrap();
 
-    // Next must follow left bracket
-    if tok.ttype != TokenType::Lb {
-        eprintln!("Missing: < \nFound instead: {}", tok.tvalue);
-        process::exit(1);
-    }
-
-    // Skip until function starts
-    // TODO: implement parse_func_params
-    while tok.ttype != TokenType::Rb {
-        tok = token_iter.next().unwrap();
-    }
-    tok = token_iter.next().unwrap();
-
-    // Check for start of func body
     if tok.ttype != TokenType::Lcb {
-        eprintln!("Missing: [ \nFound instead: {}", tok.tvalue);
+        eprintln!("Missing [ after function name.\nFound instead: {}", tok.tvalue);
         process::exit(1);
     }
     tok = token_iter.next().unwrap();

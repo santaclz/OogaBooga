@@ -1,8 +1,0 @@
-numba main<> [
-
-	numba a;
-	a = 1;
-	numba b = 2;
-
-	begone 0;
-]

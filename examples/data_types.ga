@@ -1,4 +1,4 @@
-numba main<>
+main
 [
 	numba a = 121;
 	numba a2=333;

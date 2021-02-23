@@ -7,6 +7,8 @@ pub fn gen_asm(ast: Vec<Node>) -> String {
     
     // Start of file
     asm_code_str += "global _start
+extern printf
+
 section .text
 
 _start:
@@ -22,57 +24,96 @@ _start:
     // Prepeare stack for start of function
     asm_code_str += 
     "
+
 main:
     push rbp;
     mov rbp,rsp;\n";
 
+    // Loop through nodes and get all strings into str_rodata
+    let mut str_rodata: Vec<&str> = Vec::new();
+
+    for node in &ast {
+        for tok in &node.svalue {
+            if tok.ttype == TokenType::Str {
+                str_rodata.push(tok.tvalue);
+            }
+        }
+    }
+
+    // Loop through nodes and generate code
     for node in ast {
         asm_code_str += match node.stype {
             StType::Assign => assign_asm(node.svalue),
             StType::Init => init_asm(node.svalue),
             StType::Return => ret_asm(node.svalue),
+            StType::Print => print_asm(node.svalue, &str_rodata),
             _ => "".to_string()
         }.as_str();
+    }
+
+    // Check if str_rodata vector is empty, if not append .rodata section
+    if !str_rodata.is_empty() {
+
+        // db "string",10 -> string with newline char
+        asm_code_str += "\nsection .rodata";
+        for (i, rostr) in str_rodata.iter().enumerate() {
+            asm_code_str += &format!("
+    {0}: db {1},10
+    {0}len equ $-{0}", format!("{}{}", "msg", i.to_string().as_str()), rostr);
+        }
     }
 
     asm_code_str
 }
 
 fn assign_asm(tokens: Vec<Token>) -> String {
-    let mut asm_code: String = String::new();
 
     // Get value from assign statement
     let val = tokens[2].tvalue;
 
     // Move value on stack
     // TODO manage stack and calcuate offsets!
-    asm_code = format!("    mov dword [rbp-{}],{};\n", 0x8, val);
-
-    asm_code
+    format!("    mov dword [rbp-{}],{};\n", 0x8, val)
 }
 
 fn init_asm(tokens: Vec<Token>) -> String {
-    let mut asm_code: String = String::new();
 
-    // Get value from assign statement
+    // Get value from init statement
     let val = tokens[3].tvalue;
 
     // Move value on stack
-    asm_code = format!("    mov dword [rbp-{}],{};\n", 0x4, val);
-
-    asm_code
+    format!("    mov dword [rbp-{}],{};\n", 0x4, val)
 }
 
 fn ret_asm(tokens: Vec<Token>) -> String {
-    let mut asm_code: String = String::new();
 
-    // Get value from assign statement
+    // Get value from return statement
     let val = tokens[1].tvalue;
 
     // Move value on stack
-    asm_code = format!("    mov eax,{};
+    format!("    mov eax,{};
     pop rbp;
-    ret;\n", val);
+    ret;\n", val)
+}
 
-    asm_code
+fn print_asm(tokens: Vec<Token>, str_rodata: &Vec<&str>) -> String {
+
+    // Get value from print statement
+    let val = tokens[2].tvalue;
+
+    // Calculate names for string variable (msg0, msg1, msg2...)
+    let mut val_name: String = String::new();
+
+    for (i, rostr) in str_rodata.iter().enumerate() {
+        if val == *rostr {
+            val_name = format!("msg{}",i);
+        }
+    }
+
+    // Move value on stack
+    format!("    mov rax,1;
+    mov rdi,1;
+    mov rsi,{0};
+    mov rdx, {0}len;
+    syscall;\n", val_name)
 }
