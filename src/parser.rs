@@ -186,7 +186,7 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
             if token_iter.next().unwrap().ttype == TokenType::Lb {
 
                 // Create pointer for iter as same value needs to pass multiple checks
-                let mut tok: &Token = token_iter.next().unwrap();
+                let tok: &Token = token_iter.next().unwrap();
 
                 if tok.ttype == TokenType::Str || tok.ttype == TokenType::ID {
 

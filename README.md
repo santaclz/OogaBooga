@@ -25,7 +25,6 @@ eat	= takes input and saves it to a variable
 ### Statements
 ```
 if			= if
-roll c in r finger i	= for c in r (with i as index) -> loops through string similar to python
 spin			= while loop
 begone			= return
 ```
@@ -138,15 +137,12 @@ section .rodata
 
 # Executing the code
 
-To execute the program copy assembly code to a file and then run:
+To execute the program run:
 ```
-$ nasm -f elf64 -o test.o test.s
-$ ld -m elf_x86_64 -o test test.o
-$ ./test
+$ ./prog
 ```
 For program in `examples/simple_assembly.ga` you should get output:
 ```
 Ooga Booga!
 Hello World!
 ```
-Will add generating executables later...
