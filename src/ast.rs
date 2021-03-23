@@ -34,7 +34,7 @@ pub struct Token<'a> {
 }
 
 // Statement type
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum StType {
     Declare,    // rock s;
     Init,       // numba a = 3;
@@ -43,7 +43,6 @@ pub enum StType {
     Input,      // eat > a;
     If,         // if true [ ]
     While,      // spin true [ ]
-    For,        // roll c in s finger i [ ]
     Return,     // begone 2;
 }
 

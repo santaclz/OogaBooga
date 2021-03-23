@@ -335,65 +335,6 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
             Node::new_block(StType::While, scond, Some(parse_block(sbody)))
         }
 
-        // For loop
-        TokenType::For => { 
-            // Slice tokens into cond and body
-            let mut scond: Vec<Token> = Vec::new();
-            let mut sbody: Vec<Token> = Vec::new();
-
-            // Put all cond tokens into scond
-            let mut tok: &Token = token_iter.next().unwrap();
-            let mut toko: Option<&Token> = Some(tok);
-
-            // Gather all tokens until start of code block
-            while tok.ttype != TokenType::Lcb {
-                
-                match toko {
-                    Some(t) => {
-                        scond.push(*t);
-                        toko = token_iter.next();
-
-                        match toko {
-                            Some(tt)    => { tok = tt; }
-                            None        => {
-                                // Error if opening bracket not found
-                                eprintln!("Error missing ] on:\n{:?}", tokens);
-                                process::exit(1);
-                            }
-                        }
-                    }
-                    
-                    None => { 
-                        // Missing condition from if
-                        eprintln!("Error missing condition on:\n{:?}", tokens);
-                        process::exit(1);
-                    }
-                }
-            }
-
-            // Skip open bracket
-            tok = token_iter.next().unwrap();
-
-            // Put all others into sbody
-            let mut br_count: u32 = 1;
-            
-            // If next element is closed bracket don't enter the while loop
-            if tok.ttype == TokenType::Rcb {
-                br_count = 0;
-            }
-
-            while br_count != 0 {
-                sbody.push(*tok);
-                tok = token_iter.next().unwrap();
-
-                if tok.ttype == TokenType::Lcb { br_count += 1; }
-                else if tok.ttype == TokenType::Rcb { br_count -= 1; }
-            }
-
-            // Parse sbody into Vec<Node>
-            Node::new_block(StType::For, scond, Some(parse_block(sbody)))
-        }
-
         // Return statement
         TokenType::Ret => Node::new(StType::Return, tokens),
 

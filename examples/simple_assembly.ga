@@ -1,5 +1,4 @@
 main [
-
 	numba a;
 	a = 1;
 	numba b = 2;

@@ -11,10 +11,6 @@ main
 	stone s = 'b';
 	hungry food = yes;
 	
-	roll c in r finger i [
-		shout < i;
-	]
-
 	spin b == 0 [
 		begone 1;
 	]

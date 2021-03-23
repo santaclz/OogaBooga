@@ -39,11 +39,21 @@ main:
         }
     }
 
+    // Store number of variables in var_stack_count for calculating stack offsets
+    // TODO if reassigning are equal dont increment
+    let mut var_stack_count: u32 = 4;
+
+    for node in &ast {
+        if node.stype == StType::Init {
+            var_stack_count += 4;
+        }
+    }
+
     // Loop through nodes and generate code
     for node in ast {
         asm_code_str += match node.stype {
-            StType::Assign => assign_asm(node.svalue),
-            StType::Init => init_asm(node.svalue),
+            StType::Assign => assign_asm(node.svalue, &mut var_stack_count),
+            StType::Init => init_asm(node.svalue, &mut var_stack_count),
             StType::Return => ret_asm(node.svalue),
             StType::Print => print_asm(node.svalue, &str_rodata),
             _ => "".to_string()
@@ -65,23 +75,26 @@ main:
     asm_code_str
 }
 
-fn assign_asm(tokens: Vec<Token>) -> String {
+fn assign_asm(tokens: Vec<Token>, var_stack_count: &mut u32) -> String {
 
     // Get value from assign statement
-    let val = tokens[2].tvalue;
+    let val = &tokens[2].tvalue;
 
     // Move value on stack
-    // TODO manage stack and calcuate offsets!
-    format!("    mov dword [rbp-{}],{};\n", 0x8, val)
+    let ret_str = format!("    mov dword [rbp-{}],{};\n", *var_stack_count, val);
+    *var_stack_count -= 4;
+    ret_str
 }
 
-fn init_asm(tokens: Vec<Token>) -> String {
+fn init_asm(tokens: Vec<Token>, var_stack_count: &mut u32) -> String {
 
     // Get value from init statement
     let val = tokens[3].tvalue;
 
     // Move value on stack
-    format!("    mov dword [rbp-{}],{};\n", 0x4, val)
+    let ret_str = format!("    mov dword [rbp-{}],{};\n", *var_stack_count, val);
+    *var_stack_count -= 4;
+    ret_str
 }
 
 fn ret_asm(tokens: Vec<Token>) -> String {

@@ -24,9 +24,9 @@ eat	= takes input and saves it to a variable
 ```
 ### Statements
 ```
-if			= if
-spin			= while loop
-begone			= return
+if	= if
+spin	= while loop
+begone	= return
 ```
 ### Brackets
 ```
@@ -79,15 +79,29 @@ _start:
 First we define a global directive `_start` which is needed for linker (ld) to know where the program starts. Then we define start of section `.text` which is used to store code.
 Then in function `_start` we call main and once it finishes we make a syscall to exit the program (exit is called by placing 60 in rax register and exit status in rdi).
 
+# Help
+```
+$ ./oogabooga -h
+OogaBooga compiler v1.0
+        
+usage: oogabooga <input file> [-asm] [-obj] [-o <output file>]
+    
+optional arguments:
+    -h              display help
+    -asm            output assembly file
+    -obj            output object file
+    -o              output file (the default is a.out)
+
+```
+
 # Program output
 
 ```
-$ cargo run examples/simple_assembly.ga
+$ ./oogabooga examples/simple_assembly.ga -asm
 
 Raw code:
 
 main [
-
 	numba a;
 	a = 1;
 	numba b = 2;
@@ -139,7 +153,7 @@ section .rodata
 
 To execute the program run:
 ```
-$ ./prog
+$ ./a.out
 ```
 For program in `examples/simple_assembly.ga` you should get output:
 ```
