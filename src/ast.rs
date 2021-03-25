@@ -37,8 +37,19 @@ pub struct Token<'a> {
 #[derive(Debug, PartialEq)]
 pub enum StType {
     Declare,    // rock s;
-    Init,       // numba a = 3;
-    Assign,     // a = 3;
+
+    InitInt,    // numba a = 3;
+    InitVar,    // numba a = b;
+    InitChar,   // numba a = 'A';
+    InitBool,   // numba a = no;
+    InitStr, // numba a = "hello";
+
+    AssignInt,  // a = 3;
+    AssignVar,  // a = b;
+    AssignChar, // a = 'A';
+    AssignBool, // a = yes;
+    AssignStr,  // a = "hello";
+
     Print,      // shout < "hello";
     Input,      // eat > a;
     If,         // if true [ ]

@@ -20,11 +20,11 @@ stone 	= char
 ### I/O commands
 ```
 shout	= prints to screen
-eat	= takes input and saves it to a variable
+eat		= takes input and saves it to a variable
 ```
 ### Statements
 ```
-if	= if
+if		= if
 spin	= while loop
 begone	= return
 ```

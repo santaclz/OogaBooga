@@ -1,4 +1,5 @@
 pub use crate::ast::{Token, TokenType, StType, Node};
+use std::collections::HashMap;
 
 pub fn gen_asm(ast: Vec<Node>) -> String {
 
@@ -40,11 +41,26 @@ main:
     }
 
     // Store number of variables in var_stack_count for calculating stack offsets
-    // TODO if reassigning are equal dont increment
+    // Use HashMap
     let mut var_stack_count: u32 = 4;
+    let mut variable_offset_table = HashMap::new();
 
     for node in &ast {
-        if node.stype == StType::Init {
+        if node.stype == StType::InitInt ||
+            node.stype == StType::InitVar ||
+            node.stype == StType::InitChar ||
+            node.stype == StType::InitBool ||
+            node.stype == StType::InitStr ||
+            node.stype == StType::Declare {
+
+            // Get variable name
+            for token in &node.svalue {
+                if token.ttype == TokenType::ID {
+                    variable_offset_table.insert(token.tvalue, var_stack_count);
+                    break;
+                }
+            }
+            
             var_stack_count += 4;
         }
     }
@@ -52,8 +68,9 @@ main:
     // Loop through nodes and generate code
     for node in ast {
         asm_code_str += match node.stype {
-            StType::Assign => assign_asm(node.svalue, &mut var_stack_count),
-            StType::Init => init_asm(node.svalue, &mut var_stack_count),
+            StType::AssignInt => assign_int_asm(node.svalue, &variable_offset_table),
+            StType::AssignVar => assign_var_asm(node.svalue, &variable_offset_table),
+            StType::InitInt => init_int_asm(node.svalue, &variable_offset_table),
             StType::Return => ret_asm(node.svalue),
             StType::Print => print_asm(node.svalue, &str_rodata),
             _ => "".to_string()
@@ -75,25 +92,43 @@ main:
     asm_code_str
 }
 
-fn assign_asm(tokens: Vec<Token>, var_stack_count: &mut u32) -> String {
+fn assign_var_asm<'a>(tokens: Vec<Token<'a>>, var_off_table: &'a HashMap<&'a str, u32>) -> String {
+
+    // Get value from assign statement
+    let var1 = &tokens[2].tvalue;
+
+    // Get variable name
+    let var2 = &tokens[0].tvalue;
+
+    // Move value on stack
+    let ret_str = format!("    mov eax,dword [rbp-{}];
+    mov dword [rbp-{}],eax;\n", var_off_table[var1], var_off_table[var2]);
+    ret_str
+}
+
+fn assign_int_asm<'a>(tokens: Vec<Token<'a>>, var_off_table: &'a HashMap<&'a str, u32>) -> String {
 
     // Get value from assign statement
     let val = &tokens[2].tvalue;
 
+    // Get variable name
+    let var = &tokens[0].tvalue;
+
     // Move value on stack
-    let ret_str = format!("    mov dword [rbp-{}],{};\n", *var_stack_count, val);
-    *var_stack_count -= 4;
+    let ret_str = format!("    mov dword [rbp-{}],{};\n", var_off_table[var], val);
     ret_str
 }
 
-fn init_asm(tokens: Vec<Token>, var_stack_count: &mut u32) -> String {
+fn init_int_asm<'a>(tokens: Vec<Token<'a>>, var_off_table: &'a HashMap<&'a str, u32>) -> String {
 
     // Get value from init statement
     let val = tokens[3].tvalue;
 
+    // Get variable name
+    let var = &tokens[1].tvalue;
+
     // Move value on stack
-    let ret_str = format!("    mov dword [rbp-{}],{};\n", *var_stack_count, val);
-    *var_stack_count -= 4;
+    let ret_str = format!("    mov dword [rbp-{}],{};\n", var_off_table[var], val);
     ret_str
 }
 

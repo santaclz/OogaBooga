@@ -56,9 +56,12 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<Node> {
 }
 
 // Parse func parameters
+// TODO
+/*
 fn parse_func_params(tokens: Vec<Token>) {
 
 }
+*/
 
 // Parse func body : turn tokens into nodes
 fn parse_block(tokens: Vec<Token>) -> Vec<Node> {
@@ -131,10 +134,10 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
 
                                 // Statement is Init unless type does not match
                                 match token_iter.next().unwrap().ttype {
-                                    TokenType::Char => Node::new(StType::Init, tokens),
-                                    TokenType::Str => Node::new(StType::Init, tokens),
-                                    TokenType::Int => Node::new(StType::Init, tokens),
-                                    TokenType::Bool => Node::new(StType::Init, tokens),
+                                    TokenType::Char => Node::new(StType::InitChar, tokens),
+                                    TokenType::Str => Node::new(StType::InitStr, tokens),
+                                    TokenType::Int => Node::new(StType::InitInt, tokens),
+                                    TokenType::Bool => Node::new(StType::InitBool, tokens),
                                     _ => {
                                         eprintln!("Error parsing init statement {:?}", tokens);
                                         process::exit(1);
@@ -158,16 +161,16 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
             }
         }
 
-        // Assign statement
+        // Assign statements
         TokenType::ID => {
             if token_iter.next().unwrap().ttype == TokenType::Equal {
                     
                 match token_iter.next().unwrap().ttype {
-                    TokenType::Char => Node::new(StType::Assign, tokens),
-                    TokenType::Str => Node::new(StType::Assign, tokens),
-                    TokenType::Int => Node::new(StType::Assign, tokens),
-                    TokenType::Bool => Node::new(StType::Assign, tokens),
-                    TokenType::ID => Node::new(StType::Assign, tokens),
+                    TokenType::Char => Node::new(StType::AssignChar, tokens),
+                    TokenType::Str => Node::new(StType::AssignStr, tokens),
+                    TokenType::Int => Node::new(StType::AssignInt, tokens),
+                    TokenType::Bool => Node::new(StType::AssignBool, tokens),
+                    TokenType::ID => Node::new(StType::AssignVar, tokens),
                     _ => {
                         eprintln!("Error parsing assign statement {:?}", tokens);
                         process::exit(1);
@@ -336,7 +339,17 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
         }
 
         // Return statement
-        TokenType::Ret => Node::new(StType::Return, tokens),
+        TokenType::Ret => {
+            let tok: Option<&Token> = token_iter.next();
+            
+            match tok {
+                Some(_t) => Node::new(StType::Return, tokens),
+                None => {
+                    eprintln!("Error no value supplied to return statement on:\n{:?}", tokens);
+                    process::exit(1);
+                }
+            }
+        }
 
         _ => {
             eprintln!("Error invalid statement!\n{:?}", tokens);
