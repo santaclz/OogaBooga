@@ -1,9 +1,0 @@
-main [
-	numba a;
-	a = 1;
-	numba b = 2;
-	shout < "Ooga Booga!";
-	shout < "Hello World!";
-
-	begone 0;
-]

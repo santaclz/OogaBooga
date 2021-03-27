@@ -1,0 +1,9 @@
+main [
+	num a;
+	a = 1;
+	num b = 2;
+	say < "Ooga Booga!";
+	say < "Hello World!";
+
+	ret 0;
+]

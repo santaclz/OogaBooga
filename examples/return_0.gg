@@ -1,0 +1,7 @@
+main [
+	if a == b[] 
+	while x != 3 []
+	say<"rock with 2+2 spaces ";
+	bool h = no;
+	ret 0;
+]

@@ -22,7 +22,6 @@ pub enum TokenType {
     Input,
     If,
     While,
-    For,
     Semicolon,
 }
 
@@ -36,13 +35,19 @@ pub struct Token<'a> {
 // Statement type
 #[derive(Debug, PartialEq)]
 pub enum StType {
-    Declare,    // rock s;
+    Declare,    // chr s;
 
-    InitInt,    // numba a = 3;
-    InitVar,    // numba a = b;
-    InitChar,   // numba a = 'A';
-    InitBool,   // numba a = no;
-    InitStr, // numba a = "hello";
+    InitInt,    // num a = 3;
+    InitVar,    // num b = a;
+    InitChar,   // chr a = 'A';
+    InitBool,   // bool a = no;
+    InitStr,    // str a = "hello";
+
+    ExprInitInt,    // num a = 3 + 2;
+    ExprInitVar,    // num a = b + c;
+    ExprInitChar,   // chr a = 'A' + 'B';
+    ExprInitBool,   // bool a = no & yes;
+    ExprInitStr,    // str a = "hello" + " world";
 
     AssignInt,  // a = 3;
     AssignVar,  // a = b;
@@ -50,11 +55,17 @@ pub enum StType {
     AssignBool, // a = yes;
     AssignStr,  // a = "hello";
 
-    Print,      // shout < "hello";
+    ExprAssignInt,  // a = 3 + 2;
+    ExprAssignVar,  // a = b + c;
+    ExprAssignChar, // a = 'A' + 'B';
+    ExprAssignBool, // a = no & yes;
+    ExprAssignStr,  // a = "hello" + " world";
+
+    Print,      // say < "hello";
     Input,      // eat > a;
     If,         // if true [ ]
-    While,      // spin true [ ]
-    Return,     // begone 2;
+    While,      // while true [ ]
+    Return,     // ret 2;
 }
 
 // Statement with its type and vector of Tokens

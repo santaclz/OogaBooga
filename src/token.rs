@@ -48,7 +48,7 @@ fn word_to_token(words: Vec<&str>) -> Vec<Token> {
     // Match struct token and put it into vector
     for word in words {
         let tok: Option<Token> = match word {
-            "numba"|"stone"|"rock"|"hungry" => Some(Token { ttype: TokenType::Type, tvalue: word }),
+            "num"|"chr"|"str"|"bool" => Some(Token { ttype: TokenType::Type, tvalue: word }),
             "<" => Some(Token { ttype: TokenType::Lb, tvalue: word }),
             ">" => Some(Token { ttype: TokenType::Rb, tvalue: word }),
             "[" => Some(Token { ttype: TokenType::Lcb, tvalue: word }),
@@ -60,12 +60,11 @@ fn word_to_token(words: Vec<&str>) -> Vec<Token> {
             "*" => Some(Token { ttype: TokenType::Mult, tvalue: word }),
             "/" => Some(Token { ttype: TokenType::Div, tvalue: word }),
             "%" => Some(Token { ttype: TokenType::Mod, tvalue: word }),
-            "begone" => Some(Token { ttype: TokenType::Ret, tvalue: word }),
-            "shout" => Some(Token { ttype: TokenType::Print, tvalue: word }),
+            "ret" => Some(Token { ttype: TokenType::Ret, tvalue: word }),
+            "say" => Some(Token { ttype: TokenType::Print, tvalue: word }),
             "eat" => Some(Token { ttype: TokenType::Input, tvalue: word }),
             "if" => Some(Token { ttype: TokenType::If, tvalue: word }),
-            "spin" => Some(Token { ttype: TokenType::While, tvalue: word }),
-            "roll" => Some(Token { ttype: TokenType::For, tvalue: word }),
+            "while" => Some(Token { ttype: TokenType::While, tvalue: word }),
             "" => None,
             _ => {
                     // Check if signed int

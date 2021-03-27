@@ -1,9 +1,0 @@
-main
-[
-	numba a = 121;
-	numba a2=333;
-	stone b = 'B';
-	rock c = "hello";
-
-	begone 0;
-]

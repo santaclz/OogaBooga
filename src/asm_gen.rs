@@ -16,8 +16,8 @@ _start:
 
     // Exit syscall
     asm_code_str += "
+    mov rdi, rax;
     mov rax, 60;
-    mov rdi, 0;
     syscall;";
 
     // main function

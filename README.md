@@ -23,26 +23,42 @@ OogaBooga syntax is similar to C. There are no function types, only labels.
 
 ### Data types
 ```
-numba 	= signed int
-hungry 	= boolean
-rock 	= string
-stone 	= char
+num 	= signed int
+bool 	= boolean (yes or no)
+str 	= string
+chr 	= char
 ```
 ### I/O commands
 ```
-shout	= prints to screen
+say	= prints to screen
 eat	= takes input and saves it to a variable
 ```
 ### Statements
 ```
-if	= if
-spin	= while loop
-begone	= return
+num x;					= declaration
+
+bool a = yes;			= initialization
+
+x = value;				= assignment
+
+if condition [...]		= if statement
+
+while condition [...]	= while loop
+
+ret value;				= return statement
 ```
 ### Brackets
 ```
-Square brackets [] are used instead of braces {}
-and greater than and less than signs <> instead of parentheses ().
+Square brackets [] are used for function and statement body 
+and greater than and less than signs <> for parameters.
+```
+### Program structure
+```
+main [
+	; your code here
+
+	ret 0;
+]
 ```
 
 # Steps
@@ -58,7 +74,7 @@ and greater than and less than signs <> instead of parentheses ().
 # Lexer
 
 Lexer recognizes tokens from supplied file and assigns them their type.
-Ex. `shout < "Ooga Booga";` is consisted from tokens: `Print`, `Lc`, `Str`, `Semicolon`.
+Ex. `say < "Ooga Booga";` is consisted from tokens: `Print`, `Lc`, `Str`, `Semicolon`.
 
 # Parser
 
@@ -83,8 +99,8 @@ section .text
 
 _start:
     call main;
+    mov rdi, rax;
     mov rax, 60;
-    mov rdi, 0;
     syscall;
 ```
 First we define a global directive `_start` which is needed for linker (ld) to know where the program starts. Then we define start of section `.text` which is used to store code.
@@ -108,18 +124,18 @@ optional arguments:
 # Program output
 
 ```
-$ ./oogabooga examples/simple_assembly.ga -asm
+$ ./oogabooga examples/simple_assembly.gg -asm
 
 Raw code:
 
 main [
-	numba a;
+	num a;
 	a = 1;
-	numba b = 2;
-	shout < "Ooga Booga!";
-	shout < "Hello World!";
+	num b = 2;
+	say < "Ooga Booga!";
+	say < "Hello World!";
 
-	begone 0;
+	ret 0;
 ]
 
 Assembly x86-64:
@@ -166,7 +182,7 @@ To execute the program run:
 ```
 $ ./a.out
 ```
-For program in `examples/simple_assembly.ga` you should get output:
+For program in `examples/simple_assembly.gg` you should get output:
 ```
 Ooga Booga!
 Hello World!

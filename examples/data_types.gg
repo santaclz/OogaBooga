@@ -1,0 +1,9 @@
+main
+[
+	num a = 121;
+	num a2=333;
+	chr b = 'B';
+	str c = "hello";
+
+	ret 0;
+]

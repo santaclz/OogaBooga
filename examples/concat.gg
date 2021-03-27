@@ -1,0 +1,6 @@
+num a = 3;
+num b=2;
+str c<num a=3>[a+a];
+v = a+b+ c/4;
+bool h=no;
+bool z = yes;

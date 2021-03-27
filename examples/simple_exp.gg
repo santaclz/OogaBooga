@@ -1,0 +1,25 @@
+main
+[
+	say < "Ooga Booga! 2+2 is ";
+	num a;
+	eat > a;
+
+	num b;
+	b=4;
+
+	str r = "banana";
+	chr s = 'b';
+	bool food = yes;
+	
+	while b == 0 [
+		ret 1;
+	]
+
+	if food [
+		say < "444";
+		a = b;
+		num g = 565;
+	]
+	
+	ret 0;
+]

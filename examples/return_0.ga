@@ -1,7 +1,0 @@
-main [
-	if a == b[] 
-	spin x != 3 []
-	shout<"rock with 2+2 spaces ";
-	hungry h = no;
-	begone 0;
-]
