@@ -6,6 +6,17 @@ Compiler written in Rust for my programming language called OogaBooga.
 
 The purpose of this project is to learn how compiler works and to get better at understanding assembly code. Also, this is my first Rust program, I just jumped straight into making a compiler with it, so far it's a great learning experience. For the sake of learning I will not be using any dependencies which would aid me in parsing the source code (RegEx, other parsers...).
 
+# Platform
+
+GNU/Linux x86_64
+
+# Requirements
+
+- nasm	= assembler
+- ld	= linker
+- rust	= language im working in
+- cargo	= for compiling rust projects
+
 # About OogaBooga
 
 OogaBooga syntax is similar to C. There is no function types only labels.
