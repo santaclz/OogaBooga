@@ -35,17 +35,17 @@ eat	= takes input and saves it to a variable
 ```
 ### Statements
 ```
-num x;					= declaration
+num x;			= declaration
 
-bool a = yes;			= initialization
+bool a = yes;		= initialization
 
-x = value;				= assignment
+x = value;		= assignment
 
-if condition [...]		= if statement
+if condition [...]	= if statement
 
 while condition [...]	= while loop
 
-ret value;				= return statement
+ret value;		= return statement
 ```
 ### Brackets
 ```
@@ -55,7 +55,7 @@ and greater than and less than signs <> for parameters.
 ### Program structure
 ```
 main [
-	; your code here
+	# your code here
 
 	ret 0;
 ]
