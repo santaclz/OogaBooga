@@ -19,7 +19,7 @@ GNU/Linux x86_64
 
 # About OogaBooga
 
-OogaBooga syntax is similar to C. There is no function types only labels.
+OogaBooga syntax is similar to C. There are no function types, only labels.
 
 ### Data types
 ```
