@@ -146,15 +146,15 @@ section .text
 
 _start:
     call main;
+    mov rdi, rax;
     mov rax, 60;
-    mov rdi, 0;
     syscall;
 
 main:
     push rbp;
     mov rbp,rsp;
-    mov dword [rbp-8],1;
-    mov dword [rbp-4],2;
+    mov dword [rbp-4],1;
+    mov dword [rbp-8],2;
     mov rax,1;
     mov rdi,1;
     mov rsi,msg0;
