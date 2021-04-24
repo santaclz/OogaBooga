@@ -2,7 +2,6 @@ pub use crate::ast::{Token, TokenType, StType, Node};
 use std::process;
 
 // Parse function returns AST view of the program
-// TODO: make nice verbose errors!
 pub fn parse_prog(tokens: Vec<Token>) -> Vec<Node> {
 
     let mut branch: Vec<Node> = Vec::new();
@@ -22,6 +21,7 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<Node> {
         eprintln!("Invalid function name {}", tok.tvalue);
         process::exit(1);
     }
+    let func_name = tok.tvalue;
     tok = token_iter.next().unwrap();
 
     if tok.ttype != TokenType::Lcb {
@@ -40,7 +40,11 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<Node> {
 
     while br_count != 0 {
         token_func_body.push(*tok);
-        tok = token_iter.next().unwrap();
+        //tok = token_iter.next().unwrap();
+        match token_iter.next() {
+            Some(i) => tok = i,
+            None    => { eprintln!("Missing ] at the end of function {}.", func_name); process::exit(1); }
+        }
 
         if tok.ttype == TokenType::Lcb { br_count += 1; }
         else if tok.ttype == TokenType::Rcb { br_count -= 1; }
@@ -49,6 +53,12 @@ pub fn parse_prog(tokens: Vec<Token>) -> Vec<Node> {
     // DEBUG
     //println!("\n\nfunc_body:\n\n{:?}", token_func_body);
     let parsed_func_body: Vec<Node> = parse_block(token_func_body);
+
+    // Check if the last statement is return
+    if parsed_func_body.len() != 0 && parsed_func_body[parsed_func_body.len() - 1].stype != StType::Return {
+        eprintln!("Missing return statement at the end of function {}.", func_name);
+        process::exit(1);
+    }
 
     branch.extend(parsed_func_body);
     
@@ -136,15 +146,18 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
                                 match token_iter.next().unwrap().ttype {
                                     TokenType::Char => Node::new(StType::InitChar, tokens),
                                     TokenType::Str => Node::new(StType::InitStr, tokens),
+
                                     TokenType::Int => Node::new(StType::InitInt, tokens),
+                                    TokenType::Minus => Node::new(StType::InitInt, tokens),
+
                                     TokenType::Bool => Node::new(StType::InitBool, tokens),
                                     _ => {
-                                        eprintln!("Error parsing init statement {:?}", tokens);
+                                        pretty_print_errors("Error parsing init statement".to_string(), &tokens);
                                         process::exit(1);
                                     }
                                 }
                             } else {
-                                eprintln!("Expected: =\nIn: {:?}", tokens);
+                                pretty_print_errors("Expected: =\nIn:".to_string(), &tokens);
                                 process::exit(1);
                             }
                         }
@@ -163,22 +176,29 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
 
         // Assign statements
         TokenType::ID => {
-            if token_iter.next().unwrap().ttype == TokenType::Equal {
+            let token_iter_tmp = match token_iter.next() {
+                Some(t) => t,
+                None    => { pretty_print_errors("Statement not recognized:".to_string(), &tokens); process::exit(1); }
+            };
+            if token_iter_tmp.ttype == TokenType::Equal {
                     
                 match token_iter.next().unwrap().ttype {
                     TokenType::Char => Node::new(StType::AssignChar, tokens),
                     TokenType::Str => Node::new(StType::AssignStr, tokens),
+
                     TokenType::Int => Node::new(StType::AssignInt, tokens),
+                    TokenType::Minus => Node::new(StType::AssignInt, tokens),
+
                     TokenType::Bool => Node::new(StType::AssignBool, tokens),
                     TokenType::ID => Node::new(StType::AssignVar, tokens),
                     _ => {
-                        eprintln!("Error parsing assign statement {:?}", tokens);
+                        pretty_print_errors("Error parsing assign statement".to_string(), &tokens);
                         process::exit(1);
                     },
                 }
             } else {
                 // The statement starts with ID but is not Assign
-                eprintln!("Error invalid statement {:?}", tokens);
+                pretty_print_errors("Error invalid statement".to_string(), &tokens);
                 process::exit(1);
             }
         }
@@ -196,11 +216,11 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
                     Node::new(StType::Print, tokens)
 
                 } else {
-                    eprintln!("Missing string from print\nFound instead: {:?}", tokens);
+                    pretty_print_errors("Missing string from print\nFound instead:".to_string(), &tokens);
                     process::exit(1);
                 }
             } else {
-                eprintln!("Missing: <\nFound: {:?}", tokens);
+                pretty_print_errors("Missing: <\nFound:".to_string(), &tokens);
                 process::exit(1);
             }
         }
@@ -211,11 +231,11 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
                 if token_iter.next().unwrap().ttype == TokenType::ID {
                     Node::new(StType::Input, tokens)
                 } else {
-                    eprintln!("Missing variable from input at: {:?}", tokens);
+                    pretty_print_errors("Missing variable from input at:".to_string(), &tokens);
                     process::exit(1);
                 }
             } else {
-                eprintln!("Missing > from input at: {:?}", tokens);
+                pretty_print_errors("Missing > from input at:".to_string(), &tokens);
                 process::exit(1);
             }
         }
@@ -242,7 +262,7 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
                             Some(tt)    => { tok = tt; }
                             None        => {
                                 // Error if opening bracket not found
-                                eprintln!("Error missing ] on:\n{:?}", tokens);
+                                pretty_print_errors("Error missing ] on:".to_string(), &tokens);
                                 process::exit(1);
                             }
                         }
@@ -250,7 +270,7 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
                     
                     None => { 
                         // Missing condition from if
-                        eprintln!("Error missing condition on:\n{:?}", tokens);
+                        pretty_print_errors("Error missing condition on:".to_string(), &tokens);
                         process::exit(1);
                     }
                 }
@@ -301,7 +321,7 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
                             Some(tt)    => { tok = tt; }
                             None        => {
                                 // Error if opening bracket not found
-                                eprintln!("Error missing ] on:\n{:?}", tokens);
+                                pretty_print_errors("Error missing ] on:".to_string(), &tokens);
                                 process::exit(1);
                             }
                         }
@@ -309,7 +329,7 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
                     
                     None => { 
                         // Missing condition from if
-                        eprintln!("Error missing condition on:\n{:?}", tokens);
+                        pretty_print_errors("Error missing condition on:".to_string(), &tokens);
                         process::exit(1);
                     }
                 }
@@ -345,16 +365,25 @@ fn parse_stat(tokens: Vec<Token>) -> Node {
             match tok {
                 Some(_t) => Node::new(StType::Return, tokens),
                 None => {
-                    eprintln!("Error no value supplied to return statement on:\n{:?}", tokens);
+                    pretty_print_errors("Error no value supplied to return statement on:".to_string(), &tokens);
                     process::exit(1);
                 }
             }
         }
 
         _ => {
-            eprintln!("Error invalid statement!\n{:?}", tokens);
+            pretty_print_errors("Error invalid statement!".to_string(), &tokens);
             process::exit(1);
         }
 
     }
+}
+
+fn pretty_print_errors(err_str: String, tokens: &Vec<Token>) {
+    eprintln!("{}", err_str);
+
+    for tok in tokens {
+        eprint!("{} ", tok.tvalue);
+    }
+    eprintln!("");
 }

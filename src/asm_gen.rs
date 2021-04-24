@@ -108,39 +108,39 @@ fn assign_var_asm<'a>(tokens: Vec<Token<'a>>, var_off_table: &'a HashMap<&'a str
 
 fn assign_int_asm<'a>(tokens: Vec<Token<'a>>, var_off_table: &'a HashMap<&'a str, u32>) -> String {
 
-    // Get value from assign statement
-    let val = &tokens[2].tvalue;
-
     // Get variable name
     let var = &tokens[0].tvalue;
 
+    // Evaluate expression if there is one
+    let mut ret_str: String = eval_expr(tokens[2..].to_vec());
+
     // Move value on stack
-    let ret_str = format!("    mov dword [rbp-{}],{};\n", var_off_table[var], val);
+    ret_str += &format!("    mov dword [rbp-{}],eax;\n", var_off_table[var]);
     ret_str
 }
 
 fn init_int_asm<'a>(tokens: Vec<Token<'a>>, var_off_table: &'a HashMap<&'a str, u32>) -> String {
 
-    // Get value from init statement
-    let val = tokens[3].tvalue;
-
     // Get variable name
     let var = &tokens[1].tvalue;
+    
+    // Evaluate expression if there is one
+    let mut ret_str: String = eval_expr(tokens[3..].to_vec());
 
     // Move value on stack
-    let ret_str = format!("    mov dword [rbp-{}],{};\n", var_off_table[var], val);
+    ret_str += &format!("    mov dword [rbp-{}],eax;\n", var_off_table[var]);
     ret_str
 }
 
 fn ret_asm(tokens: Vec<Token>) -> String {
 
-    // Get value from return statement
-    let val = tokens[1].tvalue;
-
+    //println!("\nRet tokens: {:?}", tokens);
     // Move value on stack
-    format!("    mov eax,{};
-    pop rbp;
-    ret;\n", val)
+    let mut final_str: String = eval_expr(tokens[1..].to_vec());
+    final_str += &format!("    pop rbp;
+    ret;\n");
+
+    final_str
 }
 
 fn print_asm(tokens: Vec<Token>, str_rodata: &Vec<&str>) -> String {
@@ -163,4 +163,24 @@ fn print_asm(tokens: Vec<Token>, str_rodata: &Vec<&str>) -> String {
     mov rsi,{0};
     mov rdx, {0}len;
     syscall;\n", val_name)
+}
+
+fn eval_expr(tokens: Vec<Token>) -> String {
+    if !tokens.is_empty() {
+        if tokens[0].ttype == TokenType::Minus {
+            format!("    mov eax,{};\n    neg eax;\n", tokens[1].tvalue)
+        } else if tokens[0].ttype == TokenType::Int {
+            if tokens.len() == 2 {
+                format!("    mov eax,{};\n    dec eax;\n", tokens[0].tvalue)
+            } else {
+                format!("    mov eax,{};\n{}", tokens[0].tvalue, eval_expr(tokens[1..].to_vec()))
+            }
+        } else if tokens[0].ttype == TokenType::Plus {
+            format!("    mov ebx,{}\n    add eax,ebx;\n", tokens[1].tvalue)
+        } else {
+            format!("")
+        }
+    } else {
+        format!("")
+    }
 }

@@ -15,7 +15,7 @@ fn main() {
     let mut out_obj_file: bool = false;
     let mut display_help: bool = false;
 
-    let mut out_file_name: &str = "a.out";
+    let mut out_file_name: &str = "a";
 
     for (i, arg) in args.iter().enumerate() {
         if arg == "-asm" { out_asm_file = true; }
