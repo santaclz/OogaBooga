@@ -4,7 +4,7 @@ Compiler written in Rust for my programming language called OogaBooga.
 
 # Why?
 
-The purpose of this project is to learn how compiler works and to get better at understanding assembly code. Also, this is my first Rust program, I just jumped straight into making a compiler with it, so far it's a great learning experience. For the sake of learning I will not be using any dependencies which would aid me in parsing the source code (RegEx, other parsers...).
+The purpose of this project is to learn how compiler works and to get better at understanding assembly code. Also, this is my first Rust program, I just jumped straight into making a compiler with it, so don't expect super high quality code. For the sake of learning I will not be using any dependencies which would aid me in parsing the source code (RegEx, other parsers...).
 
 ## Platform
 
