@@ -105,7 +105,7 @@ fn slice_syntax(word: &str) -> Vec<&str> {
     // If the given input contains whitespace it's a string
     if word.contains(" ")       { vec!(word); }
 
-    else if word.contains("<")       { separator = '<';  }
+    else if word.contains("<")  { separator = '<';  }
     else if word.contains(">")  { separator = '>';  }
     else if word.contains("[")  { separator = '[';  }
     else if word.contains("]")  { separator = ']';  }
