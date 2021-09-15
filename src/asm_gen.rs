@@ -157,7 +157,7 @@ fn print_asm(tokens: Vec<Token>, str_rodata: &Vec<&str>) -> String {
         }
     }
 
-    // Move value on stack
+    // Call sys_write
     format!("    mov rax,1;
     mov rdi,1;
     mov rsi,{0};
@@ -165,21 +165,44 @@ fn print_asm(tokens: Vec<Token>, str_rodata: &Vec<&str>) -> String {
     syscall;\n", val_name)
 }
 
+// This function takes care of evaluating calculations and storing the result in rax register
 fn eval_expr(tokens: Vec<Token>) -> String {
+
     if !tokens.is_empty() {
-        if tokens[0].ttype == TokenType::Minus {
-            format!("    mov eax,{};\n    neg eax;\n", tokens[1].tvalue)
-        } else if tokens[0].ttype == TokenType::Int {
-            if tokens.len() == 2 {
-                format!("    mov eax,{};\n    dec eax;\n", tokens[0].tvalue)
-            } else {
-                format!("    mov eax,{};\n{}", tokens[0].tvalue, eval_expr(tokens[1..].to_vec()))
-            }
-        } else if tokens[0].ttype == TokenType::Plus {
-            format!("    mov ebx,{}\n    add eax,ebx;\n", tokens[1].tvalue)
-        } else {
-            format!("")
+
+        let mut ret_str: String = String::new();
+
+        // Evaluate first number value in eax register
+        if tokens[0].ttype == TokenType::Int {
+            ret_str += &format!("    mov eax,{};\n", tokens[0].tvalue);
         }
+        // TODO
+        // Handle case if the first number is negative
+        // Handle case if the first number is complement
+
+        // Iterate through others if any
+        let mut token_iter = tokens.iter();
+
+        while let Some(tok) = token_iter.next() {
+
+            // At this point first number should already be in eax/rax
+            if tok.ttype == TokenType::Minus {
+                // eax - n
+                ret_str += &format!("    sub eax,{};\n", token_iter.next().unwrap().tvalue);
+            } else if tok.ttype == TokenType::Plus {
+                // eax + n
+                ret_str += &format!("    add eax,{};\n", token_iter.next().unwrap().tvalue);
+            } else if tok.ttype == TokenType::Mult {
+                // eax * n
+                ret_str += &format!("    imul eax,{};\n", token_iter.next().unwrap().tvalue);
+            } else if tok.ttype == TokenType::Div {
+                // eax / n
+                ret_str += &format!("    mov ebx,{}\n    cdq;\n    idiv ebx;\n", token_iter.next().unwrap().tvalue);
+            }
+        }
+
+        ret_str
+
     } else {
         format!("")
     }

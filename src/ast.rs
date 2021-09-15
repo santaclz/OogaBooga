@@ -13,6 +13,7 @@ pub enum TokenType {
     Mult,
     Div,
     Mod,
+    Complement,
     Lb,
     Rb,
     Lcb,

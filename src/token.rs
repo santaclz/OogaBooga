@@ -60,6 +60,7 @@ fn word_to_token(words: Vec<&str>) -> Vec<Token> {
             "*" => Some(Token { ttype: TokenType::Mult, tvalue: word }),
             "/" => Some(Token { ttype: TokenType::Div, tvalue: word }),
             "%" => Some(Token { ttype: TokenType::Mod, tvalue: word }),
+            "~" => Some(Token { ttype: TokenType::Complement, tvalue: word }),
             "ret" => Some(Token { ttype: TokenType::Ret, tvalue: word }),
             "say" => Some(Token { ttype: TokenType::Print, tvalue: word }),
             "eat" => Some(Token { ttype: TokenType::Input, tvalue: word }),
@@ -116,6 +117,7 @@ fn slice_syntax(word: &str) -> Vec<&str> {
     else if word.contains("/")  { separator = '/';  }
     else if word.contains("^")  { separator = '^';  }
     else if word.contains("%")  { separator = '%';  }
+    else if word.contains("~")  { separator = '~';  }
     else if word.contains("|")  { separator = '|';  }
     else if word.contains("&")  { separator = '&';  }
     // Not a real token, just a separator

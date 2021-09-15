@@ -104,8 +104,12 @@ fn parse_block(tokens: Vec<Token>) -> Vec<Node> {
             stat_tokens.push(tok);
         } else {
 
-            // Fix not including ] at the end
+            // Include ]
             if tok.ttype == TokenType::Rcb {
+                stat_tokens.push(tok);
+            } 
+            // Include semicolon
+            else if tok.ttype == TokenType::Semicolon {
                 stat_tokens.push(tok);
             }
             
