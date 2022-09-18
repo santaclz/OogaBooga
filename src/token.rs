@@ -31,7 +31,11 @@ pub fn tokenizer(raw_code: &str) -> Vec<Token> {
     for word in raw_code_split {
         
         // Check if word contains brackets or operators and split
-        tokens.extend(word_to_token(slice_syntax(word)));
+        if word.starts_with("\"") {
+            tokens.extend(word_to_token(vec!(word)));
+        } else {
+            tokens.extend(word_to_token(slice_syntax(word)));
+        }
 
     }
 
