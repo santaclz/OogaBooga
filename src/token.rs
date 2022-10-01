@@ -9,22 +9,31 @@ pub fn tokenizer(raw_code: &str) -> Vec<Token> {
     // Split all words unless they are enclosed in quotes
     let mut raw_code_split: Vec<&str> = Vec::new();
 
-    for (i, mut w) in raw_code.split('"').enumerate() {
+    // Split by lines
+    for line in raw_code.lines() {
 
-        // All odd elements of splitted code are strings
-        if i % 2 == 0 {
-            // Push all elements to vec
-            for ww in w.split_whitespace() {
-                raw_code_split.push(ww);
+        // Skip comments
+        if line.starts_with("#") {
+            continue;
+        }
+
+        for (i, mut w) in line.split('"').enumerate() {
+
+            // All odd elements of splitted code are strings
+            if i % 2 == 0 {
+                // Push all elements to vec
+                for ww in w.split_whitespace() {
+                    raw_code_split.push(ww);
+                }
+            } else {
+                // Otherwise push entire string onto vec
+                // Find string in line and add quotes from start-1 to end+1
+                // This is needed because we are operating on references and quotes are needed for
+                // further string processing
+                let start_str = line.find(w).unwrap();
+                w = &line[start_str - 1 .. start_str + w.len() + 1];
+                raw_code_split.push(w);
             }
-        } else {
-            // Otherwise push entire string onto vec
-            // Find string in raw_code and add quotes from start-1 to end+1
-            // This is needed because we are operating on references and quotes are needed for
-            // further string processing
-            let start_str = raw_code.find(w).unwrap();
-            w = &raw_code[start_str - 1 .. start_str + w.len() + 1];
-            raw_code_split.push(w);
         }
     }
 
@@ -45,7 +54,7 @@ pub fn tokenizer(raw_code: &str) -> Vec<Token> {
 
 fn word_to_token(words: Vec<&str>) -> Vec<Token> {
     // DEBUG
-    //println!("\n\nword_to_token:\n\n{:?}", words);
+    println!("\n\nword_to_token:\n\n{:?}", words);
 
     let mut tokens_vec: Vec<Token> = Vec::new();
 
