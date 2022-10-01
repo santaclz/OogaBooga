@@ -54,7 +54,7 @@ pub fn tokenizer(raw_code: &str) -> Vec<Token> {
 
 fn word_to_token(words: Vec<&str>) -> Vec<Token> {
     // DEBUG
-    println!("\n\nword_to_token:\n\n{:?}", words);
+    //println!("\n\nword_to_token:\n\n{:?}", words);
 
     let mut tokens_vec: Vec<Token> = Vec::new();
 
